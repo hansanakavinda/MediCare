@@ -1,0 +1,18 @@
+﻿@model MediCare.Models.DOCTOR
+<h2>@Model.USER.FULL_NAME</h2>
+<p>Specialty: @Model.SPECIALTY?.NAME</p>
+<p>Clinic: @Model.CLINIC?.NAME</p>
+<p>Fee: @Model.FEE</p>
+
+<h3>Available Schedule</h3>
+<table class="table">
+    <tr><th>Day</th><th>Start</th><th>End</th></tr>
+    @foreach (var s in Model.SCHEDULEs)
+    {
+        <tr>
+            <td>@s.DAY_OF_WEEK</td>
+            <td>@s.START_TIME</td>
+            <td>@s.END_TIME</td>
+        </tr>
+    }
+</table>

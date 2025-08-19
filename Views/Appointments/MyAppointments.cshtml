@@ -1,0 +1,13 @@
+﻿@model IEnumerable<MediCare.Models.APPOINTMENT>
+<h2>My Appointments</h2>
+<table class="table">
+    <tr><th>Doctor</th><th>Date</th><th>Status</th></tr>
+    @foreach (var a in Model)
+    {
+        <tr>
+            <td>@a.DOCTOR.USER.FULL_NAME</td>
+            <td>@a.SCHEDULED_AT</td>
+            <td>@a.STATUS</td>
+        </tr>
+    }
+</table>

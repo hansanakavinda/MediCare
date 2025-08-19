@@ -1,0 +1,29 @@
+﻿@model IEnumerable<MediCare.Models.DOCTOR>
+@{
+    var specs = ViewBag.Specialties as List<MediCare.Models.SPECIALTY>;
+}
+<h2>Find Doctors</h2>
+<form method="get">
+    <input type="text" name="q" placeholder="Search name" />
+    <select name="specialtyId">
+        <option value="">All Specialties</option>
+        @foreach (var s in specs)
+        {
+            <option value="@s.SPECIALTY_ID">@s.NAME</option>
+        }
+    </select>
+    <button>Search</button>
+</form>
+<table class="table">
+    <tr><th>Name</th><th>Specialty</th><th>Clinic</th><th>Fee</th><th></th></tr>
+    @foreach (var d in Model)
+    {
+        <tr>
+            <td>@d.USER?.FULL_NAME</td>
+            <td>@d.SPECIALTY?.NAME</td>
+            <td>@d.CLINIC?.NAME</td>
+            <td>@d.FEE</td>
+            <td><a href="/Doctors/Details/@d.DOCTOR_ID">View</a></td>
+        </tr>
+    }
+</table>
