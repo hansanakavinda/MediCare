@@ -20,3 +20,19 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+.hero-section {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+}
+
+.card {
+    transition: transform 0.2s;
+}
+
+    .card:hover {
+        transform: translateY(-5px);
+    }
+
+.bg-primary {
+    background-color: #007bff !important;
+}
