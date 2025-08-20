@@ -1,0 +1,90 @@
+﻿@{
+    ViewData["Title"] = "Add New Doctor - MediCare";
+    var specialties = ViewBag.Specialties as List<MediCare.Models.SPECIALTY>;
+    var clinics = ViewBag.Clinics as List<MediCare.Models.CLINIC>;
+}
+
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2><i class="fas fa-user-md me-2"></i>Add New Doctor</h2>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            @if (ViewBag.Error != null)
+            {
+                <div class="alert alert-danger">@ViewBag.Error</div>
+            }
+
+            <form method="post">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Full Name *</label>
+                        <input type="text" name="fullName" class="form-control" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Email *</label>
+                        <input type="email" name="email" class="form-control" required />
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Password *</label>
+                        <input type="password" name="password" class="form-control" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Phone</label>
+                        <input type="text" name="phone" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Specialty *</label>
+                        <select name="specialtyId" class="form-control" required>
+                            <option value="">Select Specialty</option>
+                            @foreach (var specialty in specialties)
+                            {
+                                <option value="@specialty.SPECIALTY_ID">@specialty.NAME</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Clinic *</label>
+                        <select name="clinicId" class="form-control" required>
+                            <option value="">Select Clinic</option>
+                            @foreach (var clinic in clinics)
+                            {
+                                <option value="@clinic.CLINIC_ID">@clinic.NAME</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Consultation Fee (LKR) *</label>
+                        <input type="number" name="fee" class="form-control" step="0.01" min="0" required />
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Bio/About</label>
+                    <textarea name="bio" class="form-control" rows="3"></textarea>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>Add Doctor
+                    </button>
+                    <a asp-action="Doctors" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Doctors
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

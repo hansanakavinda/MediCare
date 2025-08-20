@@ -1,0 +1,78 @@
+﻿@model List<MediCare.Models.DOCTOR>
+@{
+    ViewData["Title"] = "Manage Doctors - MediCare";
+}
+
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <h2><i class="fas fa-user-md me-2"></i>Manage Doctors</h2>
+            <a asp-action="AddDoctor" class="btn btn-success">
+                <i class="fas fa-plus me-2"></i>Add New Doctor
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Specialty</th>
+                            <th>Clinic</th>
+                            <th>Fee</th>
+                            <th>Email</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var doctor in Model)
+                        {
+                            <tr>
+                                <td>@doctor.USER.FULL_NAME</td>
+                                <td>@doctor.SPECIALTY?.NAME</td>
+                                <td>@doctor.CLINIC?.NAME</td>
+                                <td>Rs. @doctor.FEE</td>
+                                <td>@doctor.USER.EMAIL</td>
+                                <td>
+                                    @if (doctor.USER.IS_ACTIVE == "Y")
+                                    {
+                                        <span class="badge bg-success">Active</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">Inactive</span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a asp-action="EditDoctor" asp-route-id="@doctor.DOCTOR_ID" class="btn btn-sm btn-primary">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <form method="post" asp-action="DeleteDoctor" onsubmit="return confirm('Are you sure you want to deactivate this doctor?');" class="d-inline">
+                                            <input type="hidden" name="doctorId" value="@doctor.DOCTOR_ID" />
+                                            <button type="submit" class="btn btn-sm btn-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

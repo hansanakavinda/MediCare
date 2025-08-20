@@ -1,0 +1,76 @@
+﻿@model List<MediCare.Models.SPECIALTY>
+@{
+    ViewData["Title"] = "Manage Specialties - MediCare";
+}
+
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2><i class="fas fa-stethoscope me-2"></i>Manage Specialties</h2>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-plus me-2"></i>Add New Specialty</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" asp-action="AddSpecialty">
+                        <div class="mb-3">
+                            <label class="form-label">Specialty Name *</label>
+                            <input type="text" name="name" class="form-control" required />
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-save me-2"></i>Add Specialty
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-list me-2"></i>Existing Specialties</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Specialty Name</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var specialty in Model)
+                                {
+                                    <tr>
+                                        <td>@specialty.SPECIALTY_ID</td>
+                                        <td>@specialty.NAME</td>
+                                    </tr>
+                                }
+                                @if (!Model.Any())
+                                {
+                                    <tr>
+                                        <td colspan="2" class="text-center">No specialties found</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

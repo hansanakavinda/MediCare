@@ -30,32 +30,32 @@
     </div>
     <div class="row">
         <div class="col-md-4 mb-4">
-            <div class="card h-100 shadow-sm">
+            <div class="card h-100 shadow-sm border-danger">
                 <div class="card-body text-center">
                     <i class="fas fa-user-shield fa-3x text-danger mb-3"></i>
                     <h5 class="card-title">Admin Portal</h5>
                     <p class="card-text">Manage doctors, patients, and system settings</p>
-                    <a href="#" class="btn btn-danger">Admin Sign In</a>
+                    <a asp-controller="Account" asp-action="Login" class="btn btn-danger btn-lg w-100">Admin Sign In</a>
                 </div>
             </div>
         </div>
         <div class="col-md-4 mb-4">
-            <div class="card h-100 shadow-sm">
+            <div class="card h-100 shadow-sm border-primary">
                 <div class="card-body text-center">
                     <i class="fas fa-user-md fa-3x text-primary mb-3"></i>
                     <h5 class="card-title">Doctor Portal</h5>
                     <p class="card-text">Manage appointments and patient consultations</p>
-                    <a href="#" class="btn btn-primary">Doctor Sign In</a>
+                    <a asp-controller="Account" asp-action="Login" class="btn btn-primary btn-lg w-100">Doctor Sign In</a>
                 </div>
             </div>
         </div>
         <div class="col-md-4 mb-4">
-            <div class="card h-100 shadow-sm">
+            <div class="card h-100 shadow-sm border-success">
                 <div class="card-body text-center">
                     <i class="fas fa-user fa-3x text-success mb-3"></i>
                     <h5 class="card-title">Patient Portal</h5>
                     <p class="card-text">Book appointments and access medical records</p>
-                    <a href="#" class="btn btn-success">Patient Sign In</a>
+                    <a asp-controller="Account" asp-action="Login" class="btn btn-success btn-lg w-100">Patient Sign In</a>
                 </div>
             </div>
         </div>
@@ -68,90 +68,6 @@
         <div class="row">
             <div class="col-lg-6">
                 <h2 class="mb-4">About MediCare Pvt Ltd</h2>
-                <p>MediCare is a leading private healthcare provider in Sri Lanka, dedicated to delivering exceptional medical services across multiple specialties. We operate several modern clinics and medical centers strategically located to serve communities nationwide.</p>
-
-                <h4 class="mt-4 mb-3">Our Mission</h4>
-                <p>To provide accessible, high-quality healthcare services while embracing technology to enhance patient experience and care delivery.</p>
-
-                <div class="row mt-4">
-                    <div class="col-6">
-                        <div class="text-center">
-                            <h3 class="text-primary">500+</h3>
-                            <p class="text-muted">Happy Patients</p>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="text-center">
-                            <h3 class="text-primary">50+</h3>
-                            <p class="text-muted">Expert Doctors</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-6">
-                <img src="~/images/clinic-interior.jpg" alt="MediCare Clinic" class="img-fluid rounded" />
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Services Section -->
-<div class="container py-5" id="services">
-    <div class="row">
-        <div class="col-12 text-center mb-5">
-            <h2>Our Medical Specialties</h2>
-            <p class="text-muted">Comprehensive healthcare services across multiple specialties</p>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-3 mb-4">
-            <div class="text-center">
-                <i class="fas fa-stethoscope fa-3x text-primary mb-3"></i>
-                <h5>General Medicine</h5>
-                <p class="text-muted">Comprehensive primary healthcare and preventive medicine</p>
-            </div>
-        </div>
-        <div class="col-md-3 mb-4">
-            <div class="text-center">
-                <i class="fas fa-baby fa-3x text-success mb-3"></i>
-                <h5>Pediatrics</h5>
-                <p class="text-muted">Specialized care for infants, children, and adolescents</p>
-            </div>
-        </div>
-        <div class="col-md-3 mb-4">
-            <div class="text-center">
-                <i class="fas fa-heartbeat fa-3x text-danger mb-3"></i>
-                <h5>Cardiology</h5>
-                <p class="text-muted">Expert care for heart and cardiovascular conditions</p>
-            </div>
-        </div>
-        <div class="col-md-3 mb-4">
-            <div class="text-center">
-                <i class="fas fa-user-md fa-3x text-warning mb-3"></i>
-                <h5>Dermatology</h5>
-                <p class="text-muted">Comprehensive skin, hair, and nail treatments</p>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Contact Information -->
-<div class="bg-dark text-white py-4">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-4">
-                <h5>Contact Us</h5>
-                <p><i class="fas fa-phone"></i> +94 11 234 5678</p>
-                <p><i class="fas fa-envelope"></i> info@medicare.lk</p>
-            </div>
-            <div class="col-md-4">
-                <h5>Main Clinic</h5>
-                <p><i class="fas fa-map-marker-alt"></i> 123 Galle Road, Colombo 03, Sri Lanka</p>
-            </div>
-            <div class="col-md-4">
-                <h5>Working Hours</h5>
-                <p>Mon - Fri: 8:00 AM - 8:00 PM</p>
-                <p>Sat - Sun: 9:00 AM - 5:00 PM</p>
             </div>
         </div>
     </div>
