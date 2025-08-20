@@ -1,0 +1,118 @@
+﻿@{
+    ViewData["Title"] = "Admin Dashboard - MediCare";
+    var stats = ViewBag.Stats;
+}
+
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4"><i class="fas fa-tachometer-alt me-2"></i>Admin Dashboard</h2>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h6 class="card-title">Total Patients</h6>
+                            <h3 class="mb-0">@stats.TotalPatients</h3>
+                        </div>
+                        <div class="ms-3">
+                            <i class="fas fa-users fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h6 class="card-title">Total Doctors</h6>
+                            <h3 class="mb-0">@stats.TotalDoctors</h3>
+                        </div>
+                        <div class="ms-3">
+                            <i class="fas fa-user-md fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h6 class="card-title">Total Appointments</h6>
+                            <h3 class="mb-0">@stats.TotalAppointments</h3>
+                        </div>
+                        <div class="ms-3">
+                            <i class="fas fa-calendar-check fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h6 class="card-title">Pending Appointments</h6>
+                            <h3 class="mb-0">@stats.PendingAppointments</h3>
+                        </div>
+                        <div class="ms-3">
+                            <i class="fas fa-clock fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-2 mb-3">
+                            <a asp-action="Doctors" class="btn btn-outline-primary w-100">
+                                <i class="fas fa-user-md d-block mb-2"></i>
+                                Manage Doctors
+                            </a>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <a asp-action="Patients" class="btn btn-outline-success w-100">
+                                <i class="fas fa-users d-block mb-2"></i>
+                                View Patients
+                            </a>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <a asp-action="Specialties" class="btn btn-outline-info w-100">
+                                <i class="fas fa-stethoscope d-block mb-2"></i>
+                                Specialties
+                            </a>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <a asp-action="Appointments" class="btn btn-outline-warning w-100">
+                                <i class="fas fa-calendar-alt d-block mb-2"></i>
+                                All Appointments
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,143 @@
+﻿@model MediCare.Models.DOCTOR
+@{
+    ViewData["Title"] = "Doctor Profile - MediCare";
+    var specialties = ViewBag.Specialties as List<MediCare.Models.SPECIALTY>;
+    var clinics = ViewBag.Clinics as List<MediCare.Models.CLINIC>;
+}
+
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4"><i class="fas fa-user-edit me-2"></i>Update Profile</h2>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-user-md me-2"></i>Doctor Information</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" asp-action="UpdateProfile">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Full Name *</label>
+                                <input type="text" name="fullName" value="@Model.USER.FULL_NAME" class="form-control" required />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Phone</label>
+                                <input type="text" name="phone" value="@Model.USER.PHONE" class="form-control" />
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Specialty *</label>
+                                <select name="specialtyId" class="form-control" required>
+                                    <option value="">Select Specialty</option>
+                                    @foreach (var specialty in specialties)
+                                    {
+                                        @if (specialty.SPECIALTY_ID == Model.SPECIALTY_ID)
+                                        {
+                                            <option value="@specialty.SPECIALTY_ID" selected>@specialty.NAME</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@specialty.SPECIALTY_ID">@specialty.NAME</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Clinic *</label>
+                                <select name="clinicId" class="form-control" required>
+                                    <option value="">Select Clinic</option>
+                                    @foreach (var clinic in clinics)
+                                    {
+                                        @if (clinic.CLINIC_ID == Model.CLINIC_ID)
+                                        {
+                                            <option value="@clinic.CLINIC_ID" selected>@clinic.NAME</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@clinic.CLINIC_ID">@clinic.NAME</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Consultation Fee (LKR) *</label>
+                            <input type="number" name="fee" value="@Model.FEE" class="form-control" step="0.01" min="0" required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Bio/About</label>
+                            <textarea name="bio" class="form-control" rows="4" placeholder="Tell patients about your experience, qualifications, and expertise...">@Model.BIO</textarea>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Update Profile
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Current Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <strong>Email:</strong>
+                        <br>@Model.USER.EMAIL
+                    </div>
+
+                    <div class="mb-3">
+                        <strong>Current Specialty:</strong>
+                        <br>@(Model.SPECIALTY?.NAME ?? "Not set")
+                    </div>
+
+                    <div class="mb-3">
+                        <strong>Current Clinic:</strong>
+                        <br>@(Model.CLINIC?.NAME ?? "Not set")
+                    </div>
+
+                    <div class="mb-3">
+                        <strong>Current Fee:</strong>
+                        <br>LKR @(Model.FEE?.ToString("N2") ?? "0.00")
+                    </div>
+
+                    <div class="mb-3">
+                        <strong>Account Status:</strong>
+                        <br>
+                        @if (Model.USER.IS_ACTIVE == "Y")
+                        {
+                            <span class="badge bg-success">Active</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">Inactive</span>
+                        }
+                    </div>
+
+                    <hr>
+                    <div class="d-grid gap-2">
+                        <a asp-action="Schedule" class="btn btn-outline-primary">
+                            <i class="fas fa-clock me-2"></i>Manage Schedule
+                        </a>
+                        <a asp-action="Appointments" class="btn btn-outline-success">
+                            <i class="fas fa-calendar me-2"></i>View Appointments
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

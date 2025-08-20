@@ -1,19 +1,77 @@
 ﻿@{
-    ViewData["Title"] = "Login";
+    ViewData["Title"] = "Login - MediCare";
 }
-<h2>Login</h2>
-<form method="post">
-    <div class="mb-3">
-        <label>Email</label>
-        <input type="email" name="email" class="form-control" required />
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="row">
+                <!-- Login Form -->
+                <div class="col-md-6">
+                    <div class="card shadow">
+                        <div class="card-header bg-primary text-white">
+                            <h4 class="mb-0"><i class="fas fa-sign-in-alt me-2"></i>Sign In</h4>
+                        </div>
+                        <div class="card-body">
+                            @if (ViewBag.Error != null)
+                            {
+                                <div class="alert alert-danger">@ViewBag.Error</div>
+                            }
+
+                            <form method="post">
+                                <div class="mb-3">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" name="email" class="form-control" required />
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Password</label>
+                                    <input type="password" name="password" class="form-control" required />
+                                </div>
+
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-sign-in-alt me-2"></i>Sign In
+                                </button>
+                            </form>
+
+                            <div class="text-center mt-3">
+                                <p>New patient? <a asp-action="Register" class="text-primary">Register here</a></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Role Information -->
+                <div class="col-md-6">
+                    <div class="card shadow">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Access Levels</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <h6 class="text-primary"><i class="fas fa-user-shield me-2"></i>Admin</h6>
+                                <small class="text-muted">Manage doctors, patients, and system settings</small>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <h6 class="text-success"><i class="fas fa-user-md me-2"></i>Doctor</h6>
+                                <small class="text-muted">Manage appointments and patient consultations</small>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <h6 class="text-warning"><i class="fas fa-user me-2"></i>Patient</h6>
+                                <small class="text-muted">Book appointments and view medical records</small>
+                            </div>
+
+                            <hr>
+                            <small class="text-muted">
+                                <i class="fas fa-lock me-1"></i>
+                                Your data is secure and protected with us.
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="mb-3">
-        <label>Password</label>
-        <input type="password" name="password" class="form-control" required />
-    </div>
-    <button class="btn btn-primary">Login</button>
-</form>
-@if (ViewBag.Error != null)
-{
-    <p class="text-danger">@ViewBag.Error</p>
-}
+</div>
