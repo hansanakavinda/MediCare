@@ -88,6 +88,54 @@ namespace MediCare.Controllers
             return RedirectToAction("Doctors");
         }
 
+        [HttpGet]
+        public async Task<IActionResult> EditDoctor(int id)  // Changed from doctorId to id
+        {
+            var doctor = await _db.DOCTORs
+                .Include(d => d.USER)
+                .Include(d => d.SPECIALTY)
+                .Include(d => d.CLINIC)
+                .FirstOrDefaultAsync(d => d.DOCTOR_ID == id);
+
+            if (doctor == null)
+            {
+                return NotFound();
+            }
+
+            ViewBag.Specialties = await _db.SPECIALTies.ToListAsync();
+            ViewBag.Clinics = await _db.CLINICs.ToListAsync();
+
+            return View(doctor);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditDoctor(int id, string fullName, string phone,
+            decimal specialtyId, decimal clinicId, string bio, decimal fee)  // Changed doctorId to id
+        {
+            var doctor = await _db.DOCTORs
+                .Include(d => d.USER)
+                .FirstOrDefaultAsync(d => d.DOCTOR_ID == id);
+
+            if (doctor == null)
+            {
+                return NotFound();
+            }
+
+            // Update user information
+            doctor.USER.FULL_NAME = fullName;
+            doctor.USER.PHONE = phone;
+
+            // Update doctor information
+            doctor.SPECIALTY_ID = specialtyId;
+            doctor.CLINIC_ID = clinicId;
+            doctor.BIO = bio;
+            doctor.FEE = fee;
+
+            await _db.SaveChangesAsync();
+
+            TempData["Success"] = "Doctor updated successfully!";
+            return RedirectToAction("Doctors");
+        }
         [HttpPost]
         public async Task<IActionResult> DeleteDoctor(int doctorId)
         {

@@ -1,0 +1,131 @@
+﻿@model MediCare.Models.DOCTOR
+@{
+    ViewData["Title"] = "Edit Doctor - MediCare";
+    var specialties = ViewBag.Specialties as List<MediCare.Models.SPECIALTY>;
+    var clinics = ViewBag.Clinics as List<MediCare.Models.CLINIC>;
+}
+
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-action="Dashboard">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a asp-action="Doctors">Doctors</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Edit Doctor</li>
+                </ol>
+            </nav>
+            <h2 class="mb-4"><i class="fas fa-user-md me-2"></i>Edit Doctor</h2>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Doctor Information</h5>
+                </div>
+                <div class="card-body">
+                    @if (ViewBag.Error != null)
+                    {
+                        <div class="alert alert-danger">
+                            @ViewBag.Error
+                        </div>
+                    }
+
+                    <form method="post">
+                        <input type="hidden" name="doctorId" value="@Model.DOCTOR_ID" />
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Email</label>
+                                <input type="text" class="form-control" value="@Model.USER.EMAIL" disabled />
+                                <small class="text-muted">Email cannot be changed</small>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Full Name</label>
+                                <input type="text" class="form-control" name="fullName" value="@Model.USER.FULL_NAME" required />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Phone</label>
+                                <input type="text" class="form-control" name="phone" value="@Model.USER.PHONE" required />
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Specialty</label>
+                                <select class="form-select" name="specialtyId" required>
+                                    @foreach (var specialty in specialties)
+                                    {
+                                        if (specialty.SPECIALTY_ID == Model.SPECIALTY_ID)
+                                        {
+                                            <option value="@specialty.SPECIALTY_ID" selected>@specialty.NAME</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@specialty.SPECIALTY_ID">@specialty.NAME</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Clinic</label>
+                                <select class="form-select" name="clinicId" required>
+                                    @foreach (var clinic in clinics)
+                                    {
+                                        if (clinic.CLINIC_ID == Model.CLINIC_ID)
+                                        {
+                                            <option value="@clinic.CLINIC_ID" selected>@clinic.NAME</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@clinic.CLINIC_ID">@clinic.NAME</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Bio</label>
+                            <textarea class="form-control" name="bio" rows="4" required>@Model.BIO</textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Consultation Fee</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" name="fee" value="@Model.FEE" min="0" step="0.01" required />
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a asp-action="Doctors" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i> Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-info-circle me-2"></i>Help</h5>
+                    <p>You can edit the doctor's information here. Some fields cannot be changed for security reasons.</p>
+                    <ul class="mb-0">
+                        <li>The email address cannot be changed</li>
+                        <li>To reset the password, please use the password reset feature</li>
+                        <li>Changing specialty or clinic will update all associated appointments</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
