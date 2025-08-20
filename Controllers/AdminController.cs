@@ -169,6 +169,29 @@ namespace MediCare.Controllers
             return RedirectToAction("Specialties");
         }
 
+        [HttpPost]
+        public async Task<IActionResult> DeleteSpecialty(decimal specialtyId)
+        {
+            var specialty = await _db.SPECIALTies.FindAsync(specialtyId);
+            if (specialty != null)
+            {
+                // Check if specialty is used by any doctors before deleting
+                bool isUsed = await _db.DOCTORs.AnyAsync(d => d.SPECIALTY_ID == specialtyId);
+
+                if (isUsed)
+                {
+                    TempData["Error"] = "Cannot delete specialty as it is assigned to one or more doctors.";
+                }
+                else
+                {
+                    _db.SPECIALTies.Remove(specialty);
+                    await _db.SaveChangesAsync();
+                    TempData["Success"] = "Specialty deleted successfully!";
+                }
+            }
+            return RedirectToAction("Specialties");
+        }
+
         // Manage Patients
         public async Task<IActionResult> Patients()
         {
