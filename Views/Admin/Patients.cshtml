@@ -1,0 +1,76 @@
+﻿@model List<MediCare.Models.PATIENT>
+@{
+    ViewData["Title"] = "Manage Patients - MediCare";
+}
+
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-action="Dashboard">Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Patients</li>
+                </ol>
+            </nav>
+            <h2><i class="fas fa-users me-2"></i>Manage Patients</h2>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="card">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0"><i class="fas fa-list me-2"></i>All Patients</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Status</th>
+                            <th>Joined On</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var patient in Model)
+                        {
+                            <tr>
+                                <td>@patient.PATIENT_ID</td>
+                                <td>@patient.USER.FULL_NAME</td>
+                                <td>@patient.USER.EMAIL</td>
+                                <td>@patient.USER.PHONE</td>
+                                <td>
+                                    @if (patient.USER.IS_ACTIVE == "Y")
+                                    {
+                                        <span class="badge bg-success">Active</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">Inactive</span>
+                                    }
+                                </td>
+                                <td>@patient.USER.CREATED_AT.ToString("yyyy-MM-dd")</td>
+                            </tr>
+                        }
+                        @if (!Model.Any())
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center">No patients found</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
