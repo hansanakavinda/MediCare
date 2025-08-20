@@ -1,0 +1,95 @@
+﻿@model MediCare.Models.DOCTOR
+@{
+    ViewData["Title"] = "Edit Doctor Schedule - MediCare";
+    var scheduleViewModels = ViewBag.ScheduleViewModels as List<MediCare.Controllers.AdminController.ScheduleViewModel>;
+}
+
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-action="Dashboard">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a asp-action="DoctorSchedules">Doctor Schedules</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Edit Schedule</li>
+                </ol>
+            </nav>
+            <h2><i class="fas fa-clock me-2"></i>Edit Doctor Schedule</h2>
+            <p class="text-muted">Doctor: @Model.USER.FULL_NAME | Specialty: @Model.SPECIALTY?.NAME</p>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Weekly Schedule</h5>
+        </div>
+        <div class="card-body">
+            <form method="post" asp-action="UpdateDoctorSchedule">
+                <input type="hidden" name="doctorId" value="@Model.DOCTOR_ID" />
+
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <p class="text-muted">Check the days when the doctor is available and set their working hours.</p>
+                    </div>
+                </div>
+
+                @foreach (var schedule in scheduleViewModels)
+                {
+                    <div class="row mb-3 align-items-center">
+                        <div class="col-md-3">
+                            <div class="form-check">
+                                <input class="form-check-input schedule-toggle" type="checkbox" name="schedules[@scheduleViewModels.IndexOf(schedule)].IsAvailable" value="true" id="day-@schedule.DayOfWeek" @(schedule.IsAvailable ? "checked" : "") />
+                                <label class="form-check-label" for="day-@schedule.DayOfWeek">
+                                    @schedule.DayName
+                                </label>
+                            </div>
+                            <input type="hidden" name="schedules[@scheduleViewModels.IndexOf(schedule)].DayOfWeek" value="@schedule.DayOfWeek" />
+                            <input type="hidden" name="schedules[@scheduleViewModels.IndexOf(schedule)].DayName" value="@schedule.DayName" />
+                        </div>
+                        <div class="col-md-4">
+                            <div class="input-group">
+                                <span class="input-group-text">From</span>
+                                <input type="time" class="form-control" name="schedules[@scheduleViewModels.IndexOf(schedule)].StartTime" value="@schedule.StartTime" @(!schedule.IsAvailable ? "disabled" : "") />
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="input-group">
+                                <span class="input-group-text">To</span>
+                                <input type="time" class="form-control" name="schedules[@scheduleViewModels.IndexOf(schedule)].EndTime" value="@schedule.EndTime" @(!schedule.IsAvailable ? "disabled" : "") />
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Save Schedule
+                        </button>
+                        <a asp-action="DoctorSchedules" class="btn btn-secondary ms-2">
+                            <i class="fas fa-arrow-left me-2"></i>Back to List
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Enable/disable time inputs based on checkbox state
+        document.addEventListener('DOMContentLoaded', function () {
+            const toggles = document.querySelectorAll('.schedule-toggle');
+            toggles.forEach(toggle => {
+                toggle.addEventListener('change', function () {
+                    const row = this.closest('.row');
+                    const timeInputs = row.querySelectorAll('input[type="time"]');
+                    timeInputs.forEach(input => {
+                        input.disabled = !this.checked;
+                    });
+                });
+            });
+        });
+    </script>
+}

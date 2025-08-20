@@ -1,0 +1,101 @@
+﻿@model List<MediCare.Models.DOCTOR>
+@{
+    ViewData["Title"] = "Manage Doctor Schedules - MediCare";
+}
+
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-action="Dashboard">Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Doctor Schedules</li>
+                </ol>
+            </nav>
+            <h2><i class="fas fa-clock me-2"></i>Manage Doctor Schedules</h2>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="card">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0"><i class="fas fa-user-md me-2"></i>All Doctors</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Specialty</th>
+                            <th>Email</th>
+                            <th>Schedule Status</th>
+                            <th>Schedule Details</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var doctor in Model)
+                        {
+                            <tr>
+                                <td>@doctor.USER.FULL_NAME</td>
+                                <td>@doctor.SPECIALTY?.NAME</td>
+                                <td>@doctor.USER.EMAIL</td>
+                                <td>
+                                    @if (doctor.SCHEDULEs.Any())
+                                    {
+                                        <span class="badge bg-success">@doctor.SCHEDULEs.Count() days scheduled</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning">No Schedule</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (doctor.SCHEDULEs.Any())
+                                    {
+                                        <small>
+                                            @string.Join(", ", doctor.SCHEDULEs.Select(s => 
+                                                $"{(s.DAY_OF_WEEK ? "Day" + s.DAY_OF_WEEK : "Unknown")} ({s.START_TIME}-{s.END_TIME})"
+                                            ))
+                                        </small>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Not set</span>
+                                    }
+                                </td>
+                                <td>
+                                    <a asp-action="EditDoctorSchedule" asp-route-id="@doctor.DOCTOR_ID" class="btn btn-sm btn-primary">
+                                        <i class="fas fa-edit me-1"></i> Edit Schedule
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                        @if (!Model.Any())
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center">No doctors found</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
