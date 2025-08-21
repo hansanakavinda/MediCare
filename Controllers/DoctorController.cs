@@ -195,6 +195,122 @@ namespace MediCare.Controllers
             TempData["Success"] = "Schedule updated successfully!";
             return RedirectToAction("Schedule");
         }
+
+        // Add this method to your existing DoctorController.cs
+        public async Task<IActionResult> ManageSchedules()
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            var doctor = await _db.DOCTORs.FirstOrDefaultAsync(d => d.USER_ID == userId);
+
+            if (doctor == null) return NotFound();
+
+            var schedules = await _db.SCHEDULEs
+                .Where(s => s.DOCTOR_ID == doctor.DOCTOR_ID)
+                .OrderBy(s => s.DAY_OF_WEEK)
+                .ThenBy(s => s.START_TIME)
+                .ToListAsync();
+
+            return View(schedules);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> EditSchedule(int id)
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            var doctor = await _db.DOCTORs.FirstOrDefaultAsync(d => d.USER_ID == userId);
+
+            if (doctor == null) return NotFound();
+
+            var schedule = await _db.SCHEDULEs
+                .FirstOrDefaultAsync(s => s.SCHEDULE_ID == id && s.DOCTOR_ID == doctor.DOCTOR_ID);
+
+            if (schedule == null) return NotFound();
+
+            return View(schedule);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditSchedule(SCHEDULE schedule)
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            var doctor = await _db.DOCTORs.FirstOrDefaultAsync(d => d.USER_ID == userId);
+
+            if (doctor == null) return NotFound();
+
+            // Ensure the doctor can only edit their own schedules
+            if (schedule.DOCTOR_ID != doctor.DOCTOR_ID) return Forbid();
+
+            _db.Update(schedule);
+            await _db.SaveChangesAsync();
+
+            TempData["Success"] = "Schedule updated successfully!";
+            return RedirectToAction("ManageSchedules");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteSchedule(int id)
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            var doctor = await _db.DOCTORs.FirstOrDefaultAsync(d => d.USER_ID == userId);
+
+            if (doctor == null) return NotFound();
+
+            var schedule = await _db.SCHEDULEs
+                .FirstOrDefaultAsync(s => s.SCHEDULE_ID == id && s.DOCTOR_ID == doctor.DOCTOR_ID);
+
+            if (schedule == null) return NotFound();
+
+            // Check if this schedule has appointments
+            var hasAppointments = await _db.APPOINTMENTs
+                .AnyAsync(a => a.SCHEDULE_ID == id);
+
+            if (hasAppointments)
+            {
+                TempData["Error"] = "Cannot delete schedule with existing appointments.";
+                return RedirectToAction("ManageSchedules");
+            }
+
+            _db.SCHEDULEs.Remove(schedule);
+            await _db.SaveChangesAsync();
+
+            TempData["Success"] = "Schedule deleted successfully!";
+            return RedirectToAction("ManageSchedules");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> AddSchedule()
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            var doctor = await _db.DOCTORs.FirstOrDefaultAsync(d => d.USER_ID == userId);
+
+            if (doctor == null) return NotFound();
+
+            var newSchedule = new SCHEDULE
+            {
+                DOCTOR_ID = doctor.DOCTOR_ID,
+                SLOT_MINUTES = 30 // Default value
+            };
+
+            return View(newSchedule);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddSchedule(SCHEDULE schedule)
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            var doctor = await _db.DOCTORs.FirstOrDefaultAsync(d => d.USER_ID == userId);
+
+            if (doctor == null) return NotFound();
+
+            // Ensure the doctor can only add schedules for themselves
+            schedule.DOCTOR_ID = doctor.DOCTOR_ID;
+
+            _db.SCHEDULEs.Add(schedule);
+            await _db.SaveChangesAsync();
+
+            TempData["Success"] = "Schedule added successfully!";
+            return RedirectToAction("ManageSchedules");
+        }
     }
 
     // Helper class for schedule form

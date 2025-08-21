@@ -1,0 +1,92 @@
+﻿@model MediCare.Models.SCHEDULE
+@{
+    ViewData["Title"] = "Edit Schedule";
+    Layout = "_DoctorLayout"; // Use your existing doctor layout
+    
+    string[] daysOfWeek = { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" };
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Edit Schedule</h1>
+        <a href="@Url.Action("ManageSchedules")" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm">
+            <i class="fas fa-arrow-left fa-sm text-white-50"></i> Back to Schedules
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Schedule Details</h6>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="@Url.Action("EditSchedule")">
+                        <input type="hidden" asp-for="SCHEDULE_ID" />
+                        <input type="hidden" asp-for="DOCTOR_ID" />
+                        
+                        <div class="form-group row">
+                            <label class="col-sm-3 col-form-label">Day of Week</label>
+                            <div class="col-sm-9">
+                                <select class="form-control" asp-for="DAY_OF_WEEK">
+                                    @for (int i = 0; i < daysOfWeek.Length; i++)
+                                    {
+                                        <option value="@i">@daysOfWeek[i]</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group row">
+                            <label class="col-sm-3 col-form-label">Start Time</label>
+                            <div class="col-sm-9">
+                                <input type="time" class="form-control" asp-for="START_TIME" required />
+                                <small class="form-text text-muted">Format: HH:MM (24-hour)</small>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group row">
+                            <label class="col-sm-3 col-form-label">End Time</label>
+                            <div class="col-sm-9">
+                                <input type="time" class="form-control" asp-for="END_TIME" required />
+                                <small class="form-text text-muted">Format: HH:MM (24-hour)</small>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group row">
+                            <label class="col-sm-3 col-form-label">Slot Duration (minutes)</label>
+                            <div class="col-sm-9">
+                                <input type="number" class="form-control" asp-for="SLOT_MINUTES" min="10" max="120" required />
+                                <small class="form-text text-muted">Appointment slot duration in minutes</small>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group row">
+                            <div class="col-sm-9 offset-sm-3">
+                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                                <a href="@Url.Action("ManageSchedules")" class="btn btn-secondary">Cancel</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Tips</h6>
+                </div>
+                <div class="card-body">
+                    <p>Set your working hours for each day of the week.</p>
+                    <ul>
+                        <li>Start and end times should use 24-hour format (e.g., 09:00, 17:30)</li>
+                        <li>Slot duration determines how long each appointment will be</li>
+                        <li>Shorter slots (15-30 min) are ideal for quick consultations</li>
+                        <li>Longer slots (45-60 min) are better for complex cases</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

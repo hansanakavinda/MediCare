@@ -122,44 +122,49 @@
                                                 }
 
                                                 <!-- Notes Modal Button -->
-                                                <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#notesModal@(appointment.APPOINTMENT_ID)" title="Add/Edit Notes">
+                                                <button type="button" class="btn btn-sm btn-outline-primary"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#notesModal@(appointment.APPOINTMENT_ID)"
+                                                        title="Add/Edit Notes">
                                                     <i class="fas fa-sticky-note"></i>
                                                 </button>
-
-                                                <!-- Notes Modal -->
-                                                <div class="modal fade" id="notesModal@(appointment.APPOINTMENT_ID)" tabindex="-1">
-                                                    <div class="modal-dialog">
-                                                        <div class="modal-content">
-                                                            <div class="modal-header">
-                                                                <h5 class="modal-title">Consultation Notes</h5>
-                                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                                            </div>
-                                                            <form method="post" asp-action="AddConsultationNotes">
-                                                                <div class="modal-body">
-                                                                    <input type="hidden" name="appointmentId" value="@appointment.APPOINTMENT_ID" />
-                                                                    <div class="mb-3">
-                                                                        <label class="form-label">Patient: @appointment.PATIENT?.USER?.FULL_NAME</label>
-                                                                        <label class="form-label">Date: @appointment.SCHEDULED_AT.ToString("MMM dd, yyyy")</label>
-                                                                    </div>
-                                                                    <div class="mb-3">
-                                                                        <label class="form-label">Consultation Notes</label>
-                                                                        <textarea name="notes" class="form-control" rows="5" placeholder="Enter consultation notes, diagnosis, prescriptions, etc.">@appointment.NOTES</textarea>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="modal-footer">
-                                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                                                    <button type="submit" class="btn btn-primary">Save Notes</button>
-                                                                </div>
-                                                            </form>
-                                                        </div>
-                                                    </div>
-                                                </div>
                                             </td>
                                         </tr>
                                     }
                                 </tbody>
                             </table>
                         </div>
+                        <!-- Render all modals outside the table for each appointment -->
+                        @foreach (var appointment in Model)
+                        {
+                            <div class="modal fade" id="notesModal@(appointment.APPOINTMENT_ID)" tabindex="-1" aria-labelledby="notesModalLabel@(appointment.APPOINTMENT_ID)" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="notesModalLabel@(appointment.APPOINTMENT_ID)">Consultation Notes</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <form method="post" asp-action="AddConsultationNotes">
+                                            <div class="modal-body">
+                                                <input type="hidden" name="appointmentId" value="@appointment.APPOINTMENT_ID" />
+                                                <div class="mb-3">
+                                                    <label class="form-label">Patient: @appointment.PATIENT?.USER?.FULL_NAME</label>
+                                                    <label class="form-label">Date: @appointment.SCHEDULED_AT.ToString("MMM dd, yyyy")</label>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Consultation Notes</label>
+                                                    <textarea name="notes" class="form-control" rows="5" placeholder="Enter consultation notes, diagnosis, prescriptions, etc.">@appointment.NOTES</textarea>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                <button type="submit" class="btn btn-primary">Save Notes</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        }
                     }
                     else
                     {

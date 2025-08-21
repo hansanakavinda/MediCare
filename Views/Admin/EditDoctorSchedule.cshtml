@@ -19,6 +19,14 @@
         </div>
     </div>
 
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
     <div class="card">
         <div class="card-header bg-primary text-white">
             <h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Weekly Schedule</h5>
@@ -30,6 +38,10 @@
                 <div class="row mb-4">
                     <div class="col-12">
                         <p class="text-muted">Check the days when the doctor is available and set their working hours.</p>
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>Note:</strong> Schedules with existing appointments cannot be removed. You can only modify their time slots.
+                        </div>
                     </div>
                 </div>
 
@@ -38,24 +50,47 @@
                     <div class="row mb-3 align-items-center">
                         <div class="col-md-3">
                             <div class="form-check">
-                                <input class="form-check-input schedule-toggle" type="checkbox" name="schedules[@scheduleViewModels.IndexOf(schedule)].IsAvailable" value="true" id="day-@schedule.DayOfWeek" @(schedule.IsAvailable ? "checked" : "") />
+                                <input class="form-check-input schedule-toggle" 
+                                       type="checkbox" 
+                                       name="schedules[@scheduleViewModels.IndexOf(schedule)].IsAvailable" 
+                                       value="true" 
+                                       id="day-@schedule.DayOfWeek" 
+                                       @(schedule.IsAvailable ? "checked" : "") 
+                                       @(schedule.HasAppointments ? "disabled" : "") />
                                 <label class="form-check-label" for="day-@schedule.DayOfWeek">
                                     @schedule.DayName
+                                    @if (schedule.HasAppointments)
+                                    {
+                                        <span class="badge bg-warning ms-2" title="This schedule has appointments and cannot be removed">
+                                            <i class="fas fa-lock"></i> Has Appointments
+                                        </span>
+                                    }
+                                    @if (schedule.ScheduleId > 0)
+                                    {
+                                        <small class="text-muted ms-2">(ID: @schedule.ScheduleId)</small>
+                                    }
                                 </label>
                             </div>
                             <input type="hidden" name="schedules[@scheduleViewModels.IndexOf(schedule)].DayOfWeek" value="@schedule.DayOfWeek" />
                             <input type="hidden" name="schedules[@scheduleViewModels.IndexOf(schedule)].DayName" value="@schedule.DayName" />
+                            <input type="hidden" name="schedules[@scheduleViewModels.IndexOf(schedule)].ScheduleId" value="@schedule.ScheduleId" />
                         </div>
                         <div class="col-md-4">
                             <div class="input-group">
                                 <span class="input-group-text">From</span>
-                                <input type="time" class="form-control" name="schedules[@scheduleViewModels.IndexOf(schedule)].StartTime" value="@schedule.StartTime" @(!schedule.IsAvailable ? "disabled" : "") />
+                                <input type="time" class="form-control" 
+                                       name="schedules[@scheduleViewModels.IndexOf(schedule)].StartTime" 
+                                       value="@schedule.StartTime" 
+                                       @(!schedule.IsAvailable && !schedule.HasAppointments ? "disabled" : "") />
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="input-group">
                                 <span class="input-group-text">To</span>
-                                <input type="time" class="form-control" name="schedules[@scheduleViewModels.IndexOf(schedule)].EndTime" value="@schedule.EndTime" @(!schedule.IsAvailable ? "disabled" : "") />
+                                <input type="time" class="form-control" 
+                                       name="schedules[@scheduleViewModels.IndexOf(schedule)].EndTime" 
+                                       value="@schedule.EndTime" 
+                                       @(!schedule.IsAvailable && !schedule.HasAppointments ? "disabled" : "") />
                             </div>
                         </div>
                     </div>
@@ -80,7 +115,7 @@
     <script>
         // Enable/disable time inputs based on checkbox state
         document.addEventListener('DOMContentLoaded', function () {
-            const toggles = document.querySelectorAll('.schedule-toggle');
+            const toggles = document.querySelectorAll('.schedule-toggle:not([disabled])');
             toggles.forEach(toggle => {
                 toggle.addEventListener('change', function () {
                     const row = this.closest('.row');
