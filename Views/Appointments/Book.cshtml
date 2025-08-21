@@ -1,0 +1,413 @@
+﻿@model MediCare.Models.DOCTOR
+
+@{
+    ViewData["Title"] = "Book Appointment";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>
+                    <i class="fas fa-calendar-plus me-2 text-primary"></i>
+                    Book Appointment
+                </h2>
+                <a asp-action="MyAppointments" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>
+                    Back to My Appointments
+                </a>
+            </div>
+
+            <!-- Display Messages -->
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show">
+                    <i class="fas fa-check-circle me-2"></i>
+                    @TempData["Success"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    @TempData["Error"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="card appointment-booking-card">
+                        <div class="card-header bg-primary text-white">
+                            <h4 class="mb-0">
+                                <i class="fas fa-stethoscope me-2"></i>
+                                Appointment Booking
+                            </h4>
+                        </div>
+                        <div class="card-body">
+                            
+                            <!-- Doctor Information -->
+                            <div class="doctor-info-section mb-4">
+                                <div class="row align-items-center">
+                                    <div class="col-md-2 text-center">
+                                        <div class="doctor-avatar-large bg-primary text-white rounded-circle">
+                                            @(Model.USER?.FULL_NAME?.FirstOrDefault() ?? 'D')
+                                        </div>
+                                    </div>
+                                    <div class="col-md-10">
+                                        <h5 class="text-primary mb-1">Dr. @(Model.USER?.FULL_NAME ?? "N/A")</h5>
+                                        <div class="doctor-details">
+                                            <p class="text-muted mb-1">
+                                                <i class="fas fa-user-md me-2"></i>
+                                                <strong>Specialty:</strong> @(Model.SPECIALTY?.NAME ?? "General Practice")
+                                            </p>
+                                            <p class="text-muted mb-1">
+                                                <i class="fas fa-hospital me-2"></i>
+                                                <strong>Clinic:</strong> @(Model.CLINIC?.NAME ?? "N/A")
+                                            </p>
+                                            @if (!string.IsNullOrEmpty(Model.CLINIC?.ADDRESS))
+                                            {
+                                                <p class="text-muted mb-1">
+                                                    <i class="fas fa-map-marker-alt me-2"></i>
+                                                    <strong>Address:</strong> @Model.CLINIC.ADDRESS
+                                                </p>
+                                            }
+                                            @if (Model.FEE.HasValue)
+                                            {
+                                                <p class="text-muted mb-1">
+                                                    <i class="fas fa-dollar-sign me-2"></i>
+                                                    <strong>Consultation Fee:</strong> LKR @Model.FEE.Value.ToString("N2")
+                                                </p>
+                                            }
+                                            @if (!string.IsNullOrEmpty(Model.USER?.PHONE))
+                                            {
+                                                <p class="text-muted mb-1">
+                                                    <i class="fas fa-phone me-2"></i>
+                                                    <strong>Contact:</strong> @Model.USER.PHONE
+                                                </p>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                @if (!string.IsNullOrEmpty(Model.BIO))
+                                {
+                                    <div class="row mt-3">
+                                        <div class="col-12">
+                                            <div class="bio-section p-3 bg-light rounded">
+                                                <h6 class="text-primary">
+                                                    <i class="fas fa-info-circle me-2"></i>About the Doctor
+                                                </h6>
+                                                <p class="mb-0 text-muted">@Model.BIO</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+
+                            <!-- Doctor's Schedule Information -->
+                            @if (Model.SCHEDULEs != null && Model.SCHEDULEs.Any())
+                            {
+                                <div class="schedule-info mb-4">
+                                    <div class="alert alert-info">
+                                        <h6 class="mb-2">
+                                            <i class="fas fa-calendar-week me-2"></i>
+                                            Doctor's Available Hours:
+                                        </h6>
+                                        <div class="row">
+                                            @foreach (var schedule in Model.SCHEDULEs)
+                                            {
+                                                <div class="col-md-6 mb-1">
+                                                    <small class="d-block">
+                                                        <i class="fas fa-clock me-1"></i>
+                                                        <strong>@(schedule.DAY_OF_WEEK ? "Available" : "Not Available"):</strong> 
+                                                        @schedule.START_TIME - @schedule.END_TIME
+                                                        @if (schedule.SLOT_MINUTES.HasValue)
+                                                        {
+                                                            <span class="text-muted">(@schedule.SLOT_MINUTES min slots)</span>
+                                                        }
+                                                    </small>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+
+                            <!-- Booking Form -->
+                            <div class="booking-form">
+                                <h5 class="text-primary mb-3">
+                                    <i class="fas fa-calendar-check me-2"></i>
+                                    Book Your Appointment
+                                </h5>
+                                
+                                <form asp-action="BookAppointment" method="post" id="bookingForm">
+                                    <input type="hidden" name="doctorId" value="@Model.DOCTOR_ID" />
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="appointmentDate" class="form-label">
+                                                    <i class="fas fa-calendar me-1"></i>
+                                                    Appointment Date <span class="text-danger">*</span>
+                                                </label>
+                                                <input type="date" 
+                                                       class="form-control" 
+                                                       id="appointmentDate" 
+                                                       name="appointmentDate" 
+                                                       required 
+                                                       min="@DateTime.Now.ToString("yyyy-MM-dd")">
+                                                <div class="form-text">Select a date for your appointment</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="appointmentTime" class="form-label">
+                                                    <i class="fas fa-clock me-1"></i>
+                                                    Appointment Time <span class="text-danger">*</span>
+                                                </label>
+                                                <select class="form-select" id="appointmentTime" name="appointmentTime" required>
+                                                    <option value="">Select Time Slot</option>
+                                                    <optgroup label="Morning">
+                                                        <option value="08:00:00">08:00 AM</option>
+                                                        <option value="08:30:00">08:30 AM</option>
+                                                        <option value="09:00:00">09:00 AM</option>
+                                                        <option value="09:30:00">09:30 AM</option>
+                                                        <option value="10:00:00">10:00 AM</option>
+                                                        <option value="10:30:00">10:30 AM</option>
+                                                        <option value="11:00:00">11:00 AM</option>
+                                                        <option value="11:30:00">11:30 AM</option>
+                                                    </optgroup>
+                                                    <optgroup label="Afternoon">
+                                                        <option value="14:00:00">02:00 PM</option>
+                                                        <option value="14:30:00">02:30 PM</option>
+                                                        <option value="15:00:00">03:00 PM</option>
+                                                        <option value="15:30:00">03:30 PM</option>
+                                                        <option value="16:00:00">04:00 PM</option>
+                                                        <option value="16:30:00">04:30 PM</option>
+                                                    </optgroup>
+                                                    <optgroup label="Evening">
+                                                        <option value="17:00:00">05:00 PM</option>
+                                                        <option value="17:30:00">05:30 PM</option>
+                                                        <option value="18:00:00">06:00 PM</option>
+                                                        <option value="18:30:00">06:30 PM</option>
+                                                    </optgroup>
+                                                </select>
+                                                <div class="form-text">Choose an available time slot</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <label for="notes" class="form-label">
+                                            <i class="fas fa-notes-medical me-1"></i>
+                                            Additional Notes <span class="text-muted">(Optional)</span>
+                                        </label>
+                                        <textarea class="form-control" 
+                                                  id="notes" 
+                                                  name="notes" 
+                                                  rows="4" 
+                                                  placeholder="Please describe your symptoms, reason for visit, or any special requirements..."></textarea>
+                                        <div class="form-text">Any additional information that might help the doctor prepare for your visit</div>
+                                    </div>
+
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="booking-summary">
+                                            <small class="text-muted">
+                                                <i class="fas fa-info-circle me-1"></i>
+                                                Appointment will be marked as "Pending" until confirmed by the clinic
+                                            </small>
+                                        </div>
+                                        <div class="booking-actions">
+                                            <a asp-action="MyAppointments" class="btn btn-outline-secondary me-2">
+                                                <i class="fas fa-times me-1"></i>
+                                                Cancel
+                                            </a>
+                                            <button type="submit" class="btn btn-primary" id="bookButton">
+                                                <i class="fas fa-calendar-check me-1"></i>
+                                                Book Appointment
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <!-- Important Information -->
+                            <div class="important-info mt-4">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="info-card p-3 bg-light rounded h-100">
+                                            <h6 class="text-primary mb-2">
+                                                <i class="fas fa-exclamation-circle me-2"></i>
+                                                Before Your Visit
+                                            </h6>
+                                            <ul class="mb-0 small">
+                                                <li>Bring a valid ID and insurance card</li>
+                                                <li>Arrive 15 minutes before your appointment</li>
+                                                <li>Bring any previous medical records</li>
+                                                <li>List of current medications</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="info-card p-3 bg-light rounded h-100">
+                                            <h6 class="text-primary mb-2">
+                                                <i class="fas fa-calendar-times me-2"></i>
+                                                Cancellation Policy
+                                            </h6>
+                                            <ul class="mb-0 small">
+                                                <li>Cancel at least 2 hours before appointment</li>
+                                                <li>No-show appointments may incur charges</li>
+                                                <li>Reschedule through your appointments page</li>
+                                                <li>Emergency cancellations are accepted</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .appointment-booking-card {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border: none;
+        border-radius: 0.5rem;
+    }
+
+    .doctor-avatar-large {
+        width: 80px;
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        font-weight: bold;
+        margin: 0 auto;
+    }
+
+    .doctor-info-section {
+        border-bottom: 1px solid #dee2e6;
+        padding-bottom: 1.5rem;
+    }
+
+    .doctor-details p {
+        font-size: 0.95rem;
+    }
+
+    .bio-section {
+        border-left: 4px solid #007bff;
+    }
+
+    .schedule-info .alert {
+        margin-bottom: 0;
+    }
+
+    .booking-form {
+        border-top: 1px solid #dee2e6;
+        padding-top: 1.5rem;
+    }
+
+    .form-label {
+        font-weight: 500;
+        color: #495057;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+
+    .info-card {
+        border-left: 4px solid #17a2b8;
+    }
+
+    .booking-summary {
+        flex: 1;
+    }
+
+    .booking-actions {
+        flex-shrink: 0;
+    }
+
+    .form-text {
+        font-size: 0.825rem;
+    }
+
+
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('bookingForm');
+        const dateInput = document.getElementById('appointmentDate');
+        const timeSelect = document.getElementById('appointmentTime');
+        const bookButton = document.getElementById('bookButton');
+
+        // Set minimum date to today
+        const today = new Date().toISOString().split('T')[0];
+        dateInput.setAttribute('min', today);
+
+        // Disable weekends (optional - remove if not needed)
+        dateInput.addEventListener('change', function() {
+            const selectedDate = new Date(this.value);
+            const dayOfWeek = selectedDate.getDay();
+            
+            // Uncomment below to disable weekends
+            // if (dayOfWeek === 0 || dayOfWeek === 6) {
+            //     alert('Please select a weekday for your appointment.');
+            //     this.value = '';
+            //     return;
+            // }
+        });
+
+        // Form submission validation
+        form.addEventListener('submit', function(e) {
+            const date = dateInput.value;
+            const time = timeSelect.value;
+
+            if (!date || !time) {
+                e.preventDefault();
+                alert('Please select both date and time for your appointment.');
+                return false;
+            }
+
+            // Check if selected date is not in the past
+            const selectedDate = new Date(date);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            if (selectedDate < today) {
+                e.preventDefault();
+                alert('Please select a future date for your appointment.');
+                return false;
+            }
+
+            // Disable button to prevent double submission
+            bookButton.disabled = true;
+            bookButton.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Booking...';
+        });
+
+        // Auto-hide alerts after 5 seconds
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                alert.style.transition = 'opacity 0.5s';
+                alert.style.opacity = '0';
+                setTimeout(function() {
+                    alert.remove();
+                }, 500);
+            });
+        }, 5000);
+
+        console.log('Appointment booking page loaded');
+    });
+</script>
