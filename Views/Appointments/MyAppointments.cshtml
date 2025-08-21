@@ -1,13 +1,270 @@
 ﻿@model IEnumerable<MediCare.Models.APPOINTMENT>
-<h2>My Appointments</h2>
-<table class="table">
-    <tr><th>Doctor</th><th>Date</th><th>Status</th></tr>
-    @foreach (var a in Model)
+    @using Microsoft.AspNetCore.Html
+
+
+    @functions {
+    private string GetStatusClass(string status)
     {
-        <tr>
-            <td>@a.DOCTOR.USER.FULL_NAME</td>
-            <td>@a.SCHEDULED_AT</td>
-            <td>@a.STATUS</td>
-        </tr>
+        return status?.ToLower() switch
+        {
+            "pending" => "border-warning",
+            "confirmed" => "border-info",
+            "completed" => "border-success",
+            "cancelled" => "border-danger",
+            _ => "border-secondary"
+        };
     }
-</table>
+
+    private IHtmlContent GetStatusBadge(string status)
+    {
+        var (badgeClass, icon, text) = status?.ToLower() switch
+        {
+            "pending" => ("warning", "clock", "Pending"),
+            "confirmed" => ("info", "check", "Confirmed"),
+            "completed" => ("success", "check-circle", "Completed"),
+            "cancelled" => ("danger", "times-circle", "Cancelled"),
+            _ => ("secondary", "question", status ?? "Unknown")
+        };
+
+        return Html.Raw($@"<span class=""badge bg-{badgeClass}"">
+                            <i class=""fas fa-{icon} me-1""></i>{text}
+                           </span>");
+    }
+}
+
+@{
+    ViewData["Title"] = "My Appointments";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>
+                    <i class="fas fa-calendar-alt me-2 text-primary"></i>
+                    My Appointments
+                </h2>
+                <a href="/Doctors" class="btn btn-primary">
+                    <i class="fas fa-plus me-1"></i>
+                    Book New Appointment
+                </a>
+            </div>
+
+            <!-- Display Messages -->
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show">
+                    <i class="fas fa-check-circle me-2"></i>
+                    @TempData["Success"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    @TempData["Error"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            @if (Model != null && Model.Any())
+            {
+                <!-- Appointments Cards -->
+                <div class="row">
+                    @foreach (var appointment in Model)
+                    {
+                        <div class="col-lg-6 col-xl-4 mb-4">
+                            <div class="card h-100 appointment-card @GetStatusClass(appointment.STATUS)">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <div class="appointment-status">
+                                        @GetStatusBadge(appointment.STATUS)
+                                    </div>
+                                    <div class="appointment-id text-muted">
+                                        #@appointment.APPOINTMENT_ID
+                                    </div>
+                                </div>
+                                
+                                <div class="card-body">
+                                    <!-- Doctor Info -->
+                                    <div class="doctor-info mb-3">
+                                        <div class="d-flex align-items-center">
+                                            <div class="doctor-avatar bg-primary text-white rounded-circle me-3">
+                                                @(appointment.DOCTOR?.USER?.FULL_NAME?.FirstOrDefault() ?? 'D')
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0">Dr. @(appointment.DOCTOR?.USER?.FULL_NAME ?? "N/A")</h6>
+                                                <small class="text-muted">@(appointment.DOCTOR?.SPECIALTY?.NAME ?? "General")</small>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Appointment Details -->
+                                    <div class="appointment-details">
+                                        <div class="detail-item mb-2">
+                                            <i class="fas fa-calendar-day text-primary me-2"></i>
+                                            <strong>@appointment.SCHEDULED_AT.ToString("dddd, MMMM dd, yyyy")</strong>
+                                        </div>
+                                        
+                                        <div class="detail-item mb-2">
+                                            <i class="fas fa-clock text-primary me-2"></i>
+                                            <strong>@appointment.SCHEDULED_AT.ToString("hh:mm tt")</strong>
+                                        </div>
+
+                                        <div class="detail-item mb-2">
+                                            <i class="fas fa-map-marker-alt text-primary me-2"></i>
+                                            @(appointment.DOCTOR?.CLINIC?.NAME ?? "N/A")
+                                        </div>
+
+                                        @if (!string.IsNullOrEmpty(appointment.NOTES))
+                                        {
+                                            <div class="detail-item mb-2">
+                                                <i class="fas fa-notes-medical text-primary me-2"></i>
+                                                <small class="text-muted">@appointment.NOTES</small>
+                                            </div>
+                                        }
+
+                                        <div class="detail-item">
+                                            <i class="fas fa-calendar-plus text-muted me-2"></i>
+                                            <small class="text-muted">Booked: @appointment.CREATED_AT.ToString("MMM dd, yyyy")</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Action Buttons -->
+                                @if (appointment.STATUS == "Pending" && appointment.SCHEDULED_AT > DateTime.Now.AddHours(2))
+                                {
+                                    <div class="card-footer bg-transparent border-0">
+                                        <div class="d-flex justify-content-end">
+                                            <form asp-action="Cancel" method="post" class="d-inline" 
+                                                  onsubmit="return confirm('Are you sure you want to cancel this appointment?')">
+                                                <input type="hidden" name="appointmentId" value="@appointment.APPOINTMENT_ID" />
+                                                <button type="submit" class="btn btn-outline-danger btn-sm">
+                                                    <i class="fas fa-times me-1"></i>
+                                                    Cancel
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- Summary Stats -->
+                <div class="row mt-4">
+                    <div class="col-md-3 mb-3">
+                        <div class="card bg-info text-white text-center">
+                            <div class="card-body">
+                                <i class="fas fa-calendar-check fa-2x mb-2"></i>
+                                <h4>@Model.Count()</h4>
+                                <small>Total Appointments</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card bg-warning text-white text-center">
+                            <div class="card-body">
+                                <i class="fas fa-clock fa-2x mb-2"></i>
+                                <h4>@Model.Count(a => a.STATUS == "Pending")</h4>
+                                <small>Pending</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card bg-success text-white text-center">
+                            <div class="card-body">
+                                <i class="fas fa-check-circle fa-2x mb-2"></i>
+                                <h4>@Model.Count(a => a.STATUS == "Completed")</h4>
+                                <small>Completed</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card bg-danger text-white text-center">
+                            <div class="card-body">
+                                <i class="fas fa-times-circle fa-2x mb-2"></i>
+                                <h4>@Model.Count(a => a.STATUS == "Cancelled")</h4>
+                                <small>Cancelled</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <!-- No Appointments State -->
+                <div class="text-center py-5">
+                    <div class="empty-state">
+                        <i class="fas fa-calendar-times fa-4x text-muted mb-4"></i>
+                        <h4 class="text-muted">No Appointments Found</h4>
+                        <p class="text-muted mb-4">You haven't booked any appointments yet. Start by finding a doctor and booking your first appointment.</p>
+                        <a href="/Doctors" class="btn btn-primary btn-lg">
+                            <i class="fas fa-search me-2"></i>
+                            Find Doctors
+                        </a>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+    .appointment-card {
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .appointment-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+
+    .doctor-avatar {
+        width: 45px;
+        height: 45px;
+        display: flex;
+        align-items: center;
+        justify-content-center;
+        font-size: 1.2rem;
+        font-weight: bold;
+    }
+
+    .detail-item {
+        font-size: 0.9rem;
+    }
+
+    .border-warning { border-left: 4px solid #ffc107 !important; }
+    .border-info { border-left: 4px solid #17a2b8 !important; }
+    .border-success { border-left: 4px solid #28a745 !important; }
+    .border-danger { border-left: 4px solid #dc3545 !important; }
+    .border-secondary { border-left: 4px solid #6c757d !important; }
+
+    .empty-state {
+        padding: 3rem 1rem;
+    }
+
+    .card-footer {
+        padding: 0.75rem 1.25rem;
+    }
+
+    .btn-outline-danger:hover {
+        transform: none;
+    }
+</style>
+
+<script>
+    // Auto-hide alerts after 5 seconds
+    setTimeout(function() {
+        $('.alert').fadeOut('slow');
+    }, 5000);
+
+    // Add confirmation for sensitive actions
+    document.addEventListener('DOMContentLoaded', function() {
+        // Additional JavaScript functionality can be added here
+        console.log('My Appointments page loaded');
+    });
+</script>

@@ -1,29 +1,222 @@
 ﻿@model IEnumerable<MediCare.Models.DOCTOR>
 @{
     var specs = ViewBag.Specialties as List<MediCare.Models.SPECIALTY>;
+    var clinics = ViewBag.Clinics as List<MediCare.Models.CLINIC>;
+    
+    // Get current filter values
+    var currentQuery = ViewBag.CurrentQuery as string ?? "";
+    var currentSpecialtyId = ViewBag.CurrentSpecialtyId as int?;
+    var currentClinicId = ViewBag.CurrentClinicId as int?;
+    var currentDayOfWeek = ViewBag.CurrentDayOfWeek as string ?? "";
 }
-<h2>Find Doctors</h2>
-<form method="get">
-    <input type="text" name="q" placeholder="Search name" />
-    <select name="specialtyId">
-        <option value="">All Specialties</option>
-        @foreach (var s in specs)
-        {
-            <option value="@s.SPECIALTY_ID">@s.NAME</option>
-        }
-    </select>
-    <button>Search</button>
-</form>
-<table class="table">
-    <tr><th>Name</th><th>Specialty</th><th>Clinic</th><th>Fee</th><th></th></tr>
-    @foreach (var d in Model)
-    {
-        <tr>
-            <td>@d.USER?.FULL_NAME</td>
-            <td>@d.SPECIALTY?.NAME</td>
-            <td>@d.CLINIC?.NAME</td>
-            <td>@d.FEE</td>
-            <td><a href="/Doctors/Details/@d.DOCTOR_ID">View</a></td>
-        </tr>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4">Find Doctors</h2>
+            
+            <!-- Enhanced Search Form -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Search & Filter Options</h5>
+                </div>
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <!-- Name Search -->
+                        <div class="col-md-6 col-lg-3">
+                            <label for="nameSearch" class="form-label">Doctor Name</label>
+                            <input type="text" 
+                                   id="nameSearch"
+                                   name="q" 
+                                   class="form-control" 
+                                   placeholder="Search by name" 
+                                   value="@currentQuery" />
+                        </div>
+
+                        <!-- Specialty Filter -->
+                        <div class="col-md-6 col-lg-3">
+                            <label for="specialtyFilter" class="form-label">Specialty</label>
+                            <select name="specialtyId" id="specialtyFilter" class="form-select">
+                                <option value="">All Specialties</option>
+                                @if (specs != null)
+                                {
+                                    @foreach (var s in specs)
+                                    {
+                                        <option value="@s.SPECIALTY_ID" selected="@(currentSpecialtyId == s.SPECIALTY_ID)">
+                                            @s.NAME
+                                        </option>
+                                    }
+                                }
+                            </select>
+                        </div>
+
+                        <!-- Location/Clinic Filter -->
+                        <div class="col-md-6 col-lg-3">
+                            <label for="locationFilter" class="form-label">Clinic/Location</label>
+                            <select name="clinicId" id="locationFilter" class="form-select">
+                                <option value="">All Locations</option>
+                                @if (clinics != null)
+                                {
+                                    @foreach (var c in clinics)
+                                    {
+                                        <option value="@c.CLINIC_ID" selected="@(currentClinicId == c.CLINIC_ID)">
+                                            @c.NAME
+                                        </option>
+                                    }
+                                }
+                            </select>
+                        </div>
+
+                        <!-- Availability Filter -->
+                        <div class="col-md-6 col-lg-3">
+                            <label for="availabilityFilter" class="form-label">Available On</label>
+                            <select name="dayOfWeek" id="availabilityFilter" class="form-select">
+                                <option value="">Any Day</option>
+                                <option value="Monday" selected="@(currentDayOfWeek == "Monday")">Monday</option>
+                                <option value="Tuesday" selected="@(currentDayOfWeek == "Tuesday")">Tuesday</option>
+                                <option value="Wednesday" selected="@(currentDayOfWeek == "Wednesday")">Wednesday</option>
+                                <option value="Thursday" selected="@(currentDayOfWeek == "Thursday")">Thursday</option>
+                                <option value="Friday" selected="@(currentDayOfWeek == "Friday")">Friday</option>
+                                <option value="Saturday" selected="@(currentDayOfWeek == "Saturday")">Saturday</option>
+                                <option value="Sunday" selected="@(currentDayOfWeek == "Sunday")">Sunday</option>
+                            </select>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="col-12">
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search me-1"></i> Search
+                                </button>
+                                <a href="/Doctors" class="btn btn-outline-secondary">
+                                    <i class="fas fa-times me-1"></i> Clear Filters
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Results Summary -->
+            @if (Model != null && Model.Any())
+            {
+                <div class="alert alert-info mb-3">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Found <strong>@Model.Count()</strong> doctor(s) matching your criteria.
+                </div>
+            }
+
+            <!-- Doctors Table -->
+            <div class="card">
+                <div class="card-body">
+                    @if (Model != null && Model.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Doctor Name</th>
+                                        <th>Specialty</th>
+                                        <th>Clinic/Location</th>
+                                        <th>Consultation Fee</th>
+                                        <th>Available Days</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var d in Model)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="avatar-sm bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2">
+                                                        @(d.USER?.FULL_NAME?.FirstOrDefault() ?? 'D')
+                                                    </div>
+                                                    <strong>@(d.USER?.FULL_NAME ?? "N/A")</strong>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-info">@(d.SPECIALTY?.NAME ?? "General")</span>
+                                            </td>
+                                            <td>
+                                                <i class="fas fa-map-marker-alt text-muted me-1"></i>
+                                                @(d.CLINIC?.NAME ?? "N/A")
+                                            </td>
+                                            <td>
+                                                @if (d.FEE.HasValue)
+                                                {
+                                                    <span class="text-success fw-bold">LKR @d.FEE.Value.ToString("N0")</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">Contact for fee</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (d.SCHEDULEs != null && d.SCHEDULEs.Any())
+                                                {
+                                                    <div class="d-flex flex-wrap gap-1">
+                                                        @foreach (var schedule in d.SCHEDULEs.Take(3))
+                                                        {
+                                                            <span class="badge bg-light text-dark">@schedule.DAY_OF_WEEK</span>
+                                                        }
+                                                        @if (d.SCHEDULEs.Count() > 3)
+                                                        {
+                                                            <span class="badge bg-secondary">+@(d.SCHEDULEs.Count() - 3) more</span>
+                                                        }
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">No schedule</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <a href="/Doctors/Details/@d.DOCTOR_ID" 
+                                                   class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-eye me-1"></i> View Details
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-user-md fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No doctors found</h5>
+                            <p class="text-muted">Try adjusting your search criteria or clear filters to see all doctors.</p>
+                            <a href="/Doctors" class="btn btn-primary">View All Doctors</a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .avatar-sm {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+        font-weight: bold;
     }
-</table>
+    
+    .table th {
+        border-top: none;
+        font-weight: 600;
+    }
+    
+    .card {
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        border: 1px solid rgba(0, 0, 0, 0.125);
+    }
+    
+    .badge {
+        font-size: 0.75em;
+    }
+</style>
