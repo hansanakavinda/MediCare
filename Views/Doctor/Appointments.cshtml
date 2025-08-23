@@ -1,6 +1,7 @@
 ﻿@model IEnumerable<MediCare.Models.APPOINTMENT>
 @{
     ViewData["Title"] = "My Appointments - Doctor Dashboard";
+    var appointments = Model.ToList();
 }
 
 <div class="container-fluid py-4">
@@ -17,7 +18,7 @@
                     <h5 class="mb-0"><i class="fas fa-list me-2"></i>All Appointments</h5>
                 </div>
                 <div class="card-body">
-                    @if (Model.Any())
+                    @if (appointments.Any())
                     {
                         <div class="table-responsive">
                             <table class="table table-hover">
@@ -32,7 +33,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach (var appointment in Model)
+                                    @foreach (var appointment in appointments)
                                     {
                                         <tr>
                                             <td>
@@ -121,12 +122,11 @@
                                                     </form>
                                                 }
 
-                                                <!-- Notes Modal Button -->
-                                                <button type="button" class="btn btn-sm btn-outline-primary"
-                                                        data-bs-toggle="modal"
-                                                        data-bs-target="#notesModal@(appointment.APPOINTMENT_ID)"
-                                                        title="Add/Edit Notes">
-                                                    <i class="fas fa-sticky-note"></i>
+                                                <!-- Prescription Modal Button -->
+                                                <button type="button" class="btn btn-sm btn-outline-success"
+                                                        onclick="openPrescriptionModal(@appointment.APPOINTMENT_ID)"
+                                                        title="Add/Edit Prescription">
+                                                    <i class="fas fa-prescription-bottle-alt"></i>
                                                 </button>
                                             </td>
                                         </tr>
@@ -134,37 +134,6 @@
                                 </tbody>
                             </table>
                         </div>
-                        <!-- Render all modals outside the table for each appointment -->
-                        @foreach (var appointment in Model)
-                        {
-                            <div class="modal fade" id="notesModal@(appointment.APPOINTMENT_ID)" tabindex="-1" aria-labelledby="notesModalLabel@(appointment.APPOINTMENT_ID)" aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="notesModalLabel@(appointment.APPOINTMENT_ID)">Consultation Notes</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                        </div>
-                                        <form method="post" asp-action="AddConsultationNotes">
-                                            <div class="modal-body">
-                                                <input type="hidden" name="appointmentId" value="@appointment.APPOINTMENT_ID" />
-                                                <div class="mb-3">
-                                                    <label class="form-label">Patient: @appointment.PATIENT?.USER?.FULL_NAME</label>
-                                                    <label class="form-label">Date: @appointment.SCHEDULED_AT.ToString("MMM dd, yyyy")</label>
-                                                </div>
-                                                <div class="mb-3">
-                                                    <label class="form-label">Consultation Notes</label>
-                                                    <textarea name="notes" class="form-control" rows="5" placeholder="Enter consultation notes, diagnosis, prescriptions, etc.">@appointment.NOTES</textarea>
-                                                </div>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                                <button type="submit" class="btn btn-primary">Save Notes</button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        }
                     }
                     else
                     {
@@ -179,3 +148,67 @@
         </div>
     </div>
 </div>
+
+<!-- Single Prescription Modal -->
+<div class="modal fade" id="prescriptionModal" tabindex="-1" aria-labelledby="prescriptionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" asp-action="AddOrEditPrescription">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="prescriptionModalLabel">Prescription</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closePrescriptionModal()"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="modalAppointmentId" name="appointmentId" value="" />
+                    <div class="mb-3">
+                        <label class="form-label" id="modalPatient"></label>
+                        <label class="form-label" id="modalDate"></label>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Prescription Content</label>
+                        <textarea id="modalContent" name="content" class="form-control" rows="5" placeholder="Enter prescription details..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="closePrescriptionModal()">Close</button>
+                    <button type="submit" class="btn btn-success">Save Prescription</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    // Store all appointments in a JS object for quick lookup
+    var appointments = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+        Model.Select(a => new {
+            id = a.APPOINTMENT_ID,
+            patient = a.PATIENT?.USER?.FULL_NAME,
+            date = a.SCHEDULED_AT.ToString("MMM dd, yyyy"),
+            content = a.PRESCRIPTIONs?.FirstOrDefault()?.CONTENT ?? ""
+        })
+    ));
+
+    function openPrescriptionModal(appointmentId) {
+        var appt = appointments.find(a => a.id === appointmentId);
+        if (!appt) return;
+
+        document.getElementById('modalAppointmentId').value = appt.id;
+        document.getElementById('modalPatient').innerText = "Patient: " + (appt.patient || "");
+        document.getElementById('modalDate').innerText = "Date: " + (appt.date || "");
+        document.getElementById('modalContent').value = appt.content || "";
+
+        var modal = new bootstrap.Modal(document.getElementById('prescriptionModal'));
+        modal.show();
+    }
+
+    function closePrescriptionModal() {
+        // Optionally clear modal fields if needed
+        document.getElementById('modalAppointmentId').value = "";
+        document.getElementById('modalPatient').innerText = "";
+        document.getElementById('modalDate').innerText = "";
+        document.getElementById('modalContent').value = "";
+    }
+</script>
+}

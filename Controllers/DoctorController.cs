@@ -53,6 +53,7 @@ namespace MediCare.Controllers
 
             var appointments = await _db.APPOINTMENTs
                 .Include(a => a.PATIENT).ThenInclude(p => p.USER)
+                .Include(a => a.PRESCRIPTIONs)
                 .Where(a => a.DOCTOR_ID == doctor.DOCTOR_ID)
                 .OrderByDescending(a => a.SCHEDULED_AT)
                 .ToListAsync();
@@ -88,27 +89,39 @@ namespace MediCare.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddConsultationNotes(int appointmentId, string notes)
+        public async Task<IActionResult> AddOrEditPrescription(decimal appointmentId, string content)
         {
-            var userId = HttpContext.Session.GetInt32("UserId");
-            var doctor = await _db.DOCTORs.FirstOrDefaultAsync(d => d.USER_ID == userId);
-
-            if (doctor == null) return Forbid();
-
             var appointment = await _db.APPOINTMENTs
-                .FirstOrDefaultAsync(a => a.APPOINTMENT_ID == appointmentId && a.DOCTOR_ID == doctor.DOCTOR_ID);
+                .Include(a => a.PRESCRIPTIONs)
+                .FirstOrDefaultAsync(a => a.APPOINTMENT_ID == appointmentId);
 
-            if (appointment != null)
+            if (appointment == null)
+                return NotFound();
+
+            var prescription = appointment.PRESCRIPTIONs.FirstOrDefault();
+            if (prescription == null)
             {
-                appointment.NOTES = notes;
-                appointment.UPDATED_AT = DateTime.Now;
-                await _db.SaveChangesAsync();
-
-                TempData["Success"] = "Consultation notes added successfully!";
+                // Add new prescription
+                prescription = new PRESCRIPTION
+                {
+                    APPOINTMENT_ID = appointmentId,
+                    CONTENT = content,
+                    CREATED_AT = DateTime.Now
+                };
+                _db.PRESCRIPTIONs.Add(prescription);
+            }
+            else
+            {
+                // Edit existing prescription
+                prescription.CONTENT = content;
+                // Optionally update CREATED_AT or add an UPDATED_AT field
             }
 
-            return RedirectToAction("Appointments");
+            await _db.SaveChangesAsync();
+            TempData["Success"] = "Prescription saved successfully.";
+            return RedirectToAction("Appointments"); // or your relevant action
         }
+
 
         [HttpGet]
         public async Task<IActionResult> Profile()
