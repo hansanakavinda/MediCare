@@ -148,6 +148,23 @@
                                         </div>
                                     </div>
                                 }
+                                <!-- Feedback Option -->
+                                @if (appointment.STATUS == "Completed")
+                                {
+                                    <div class="card-footer bg-transparent border-0">
+                                        <div class="d-flex justify-content-end">
+                                            @* Check if feedback exists (simple approach: check via ViewBag or TempData later; 
+                                               here we just always show the link for simplicity) *@
+                                            <a asp-controller="Feedback" asp-action="Create" 
+                                               asp-route-appointmentId="@appointment.APPOINTMENT_ID"
+                                               class="btn btn-outline-primary btn-sm">
+                                                <i class="fas fa-star me-1"></i>
+                                                Give Feedback
+                                            </a>
+                                        </div>
+                                    </div>
+                                }
+
                             </div>
                         </div>
                     }

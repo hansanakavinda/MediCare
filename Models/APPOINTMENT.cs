@@ -25,6 +25,8 @@ public partial class APPOINTMENT
 
     public virtual DOCTOR DOCTOR { get; set; } = null!;
 
+    public virtual ICollection<FEEDBACK> FEEDBACKs { get; set; } = new List<FEEDBACK>();
+
     public virtual PATIENT PATIENT { get; set; } = null!;
 
     public virtual ICollection<PAYMENT> PAYMENTs { get; set; } = new List<PAYMENT>();

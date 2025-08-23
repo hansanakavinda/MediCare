@@ -35,7 +35,6 @@ public partial class AppDbContext : DbContext
 
     public virtual DbSet<USER> USERs { get; set; }
 
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder
@@ -150,13 +149,17 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.FEEDBACK_ID)
                 .ValueGeneratedOnAdd()
                 .HasColumnType("NUMBER");
+            entity.Property(e => e.APPOINTMENT_ID).HasColumnType("NUMBER");
             entity.Property(e => e.CREATED_AT)
                 .HasPrecision(6)
                 .HasDefaultValueSql("SYSTIMESTAMP ");
             entity.Property(e => e.DOCTOR_ID).HasColumnType("NUMBER");
             entity.Property(e => e.MSG).HasColumnType("CLOB");
             entity.Property(e => e.PATIENT_ID).HasColumnType("NUMBER");
-            entity.Property(e => e.RATING).HasColumnType("NUMBER(1)");
+
+            entity.HasOne(d => d.APPOINTMENT).WithMany(p => p.FEEDBACKs)
+                .HasForeignKey(d => d.APPOINTMENT_ID)
+                .HasConstraintName("FK_FEEDBACK_APPOINTMENT");
 
             entity.HasOne(d => d.DOCTOR).WithMany(p => p.FEEDBACKs)
                 .HasForeignKey(d => d.DOCTOR_ID)

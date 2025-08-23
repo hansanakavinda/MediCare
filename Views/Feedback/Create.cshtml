@@ -1,0 +1,201 @@
+﻿@{
+    ViewData["Title"] = "Give Feedback";
+    var appointment = ViewBag.Appointment as MediCare.Models.APPOINTMENT;
+}
+
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white text-center">
+                    <h4 class="mb-0">
+                        <i class="fas fa-star me-2"></i>
+                        Give Feedback
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Doctor Information -->
+                    @if (appointment != null)
+                    {
+                        <div class="doctor-info mb-4 p-3 bg-light rounded">
+                            <div class="d-flex align-items-center">
+                                <div class="doctor-avatar bg-primary text-white rounded-circle me-3">
+                                    @(appointment.DOCTOR?.USER?.FULL_NAME?.FirstOrDefault() ?? 'D')
+                                </div>
+                                <div>
+                                    <h5 class="mb-1">Dr. @(appointment.DOCTOR?.USER?.FULL_NAME ?? "N/A")</h5>
+                                    <p class="text-muted mb-1">@(appointment.DOCTOR?.SPECIALTY?.NAME ?? "General")</p>
+                                    <small class="text-muted">
+                                        Appointment: @appointment.SCHEDULED_AT.ToString("MMM dd, yyyy") at @appointment.SCHEDULED_AT.ToString("hh:mm tt")
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    <!-- Feedback Form -->
+                    <form asp-action="SendFeedback" asp-route-appointmentId="@(appointment?.APPOINTMENT_ID)" method="post" id="feedbackForm">
+                        
+                        <!-- Message Section -->
+                        <div class="mb-4">
+                            <label for="message" class="form-label fw-bold">
+                                <i class="fas fa-comment me-1"></i>
+                                Share your experience (Optional)
+                            </label>
+                            <textarea name="message" 
+                                      id="message" 
+                                      class="form-control" 
+                                      rows="4" 
+                                      placeholder="Tell us about your appointment experience, the doctor's professionalism, treatment quality, etc."
+                                      maxlength="500"></textarea>
+                            <div class="form-text">
+                                <span id="charCount">0</span>/500 characters
+                            </div>
+                        </div>
+
+                        <!-- Guidelines -->
+                        <div class="alert alert-info">
+                            <h6><i class="fas fa-info-circle me-2"></i>Feedback Guidelines:</h6>
+                            <ul class="mb-0 small">
+                                <li>Your feedback helps improve healthcare services</li>
+                                <li>Be honest and constructive in your review</li>
+                                <li>Avoid sharing personal medical information</li>
+                                <li>You can only provide one feedback per doctor</li>
+                            </ul>
+                        </div>
+
+                        <!-- Submit Buttons -->
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="/Payments/MyPayments" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-1"></i>
+                                Back to Payments
+                            </a>
+                            <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+                                <i class="fas fa-paper-plane me-2"></i>
+                                Submit Feedback
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .doctor-avatar {
+        width: 60px;
+        height: 60px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .star-rating {
+        display: flex;
+        justify-content: center;
+        gap: 5px;
+        font-size: 2rem;
+    }
+
+    .star-rating input[type="radio"] {
+        display: none;
+    }
+
+    .star-rating .star-label {
+        cursor: pointer;
+        color: #ddd;
+        transition: color 0.2s ease;
+    }
+
+    .star-rating .star-label:hover,
+    .star-rating input[type="radio"]:checked ~ .star-label,
+    .star-rating .star-label:hover ~ .star-label {
+        color: #ffc107;
+    }
+
+    .star-rating input[type="radio"]:checked + .star-label {
+        color: #ffc107;
+    }
+
+    /* Reverse order for proper hover effect */
+    .star-rating {
+        flex-direction: row-reverse;
+        justify-content: center;
+    }
+
+    .star-rating .star-label:hover ~ .star-label {
+        color: #ffc107;
+    }
+
+    .rating-container {
+        background: #f8f9fa;
+        border-radius: 10px;
+        border: 2px dashed #dee2e6;
+    }
+
+    .card {
+        border: none;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+
+    .doctor-info {
+        border-left: 4px solid #007bff;
+    }
+
+    .btn-lg {
+        padding: 0.75rem 2rem;
+        font-size: 1.1rem;
+    }
+
+    .form-control:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ratingInputs = document.querySelectorAll('input[name="rating"]');
+        const ratingText = document.getElementById('ratingText');
+        const submitBtn = document.getElementById('submitBtn');
+        const messageTextarea = document.getElementById('message');
+        const charCount = document.getElementById('charCount');
+
+        const ratingTexts = {
+            1: 'Poor - Very dissatisfied',
+            2: 'Fair - Somewhat dissatisfied', 
+            3: 'Good - Satisfied',
+            4: 'Very Good - Very satisfied',
+            5: 'Excellent - Extremely satisfied'
+        };
+
+
+        // Handle character count
+        messageTextarea.addEventListener('input', function() {
+            const count = this.value.length;
+            charCount.textContent = count;
+            
+            if (count > 450) {
+                charCount.className = 'text-warning';
+            } else if (count > 480) {
+                charCount.className = 'text-danger';
+            } else {
+                charCount.className = '';
+            }
+        });
+
+        // Form submission
+        document.getElementById('feedbackForm').addEventListener('submit', function() {
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Submitting...';
+            submitBtn.disabled = true;
+        });
+
+        // Auto-focus on first star
+        setTimeout(() => {
+            document.querySelector('.star-rating').focus();
+        }, 500);
+    });
+</script>

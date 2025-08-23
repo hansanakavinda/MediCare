@@ -11,11 +11,13 @@ public partial class FEEDBACK
 
     public decimal DOCTOR_ID { get; set; }
 
-    public bool RATING { get; set; }
-
     public string? MSG { get; set; }
 
     public DateTime CREATED_AT { get; set; }
+
+    public decimal? APPOINTMENT_ID { get; set; }
+
+    public virtual APPOINTMENT? APPOINTMENT { get; set; }
 
     public virtual DOCTOR DOCTOR { get; set; } = null!;
 
