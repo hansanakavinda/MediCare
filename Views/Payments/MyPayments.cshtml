@@ -134,7 +134,7 @@
                                                 @{
                                                     var statusBadge = payment.STATUS?.ToLower() switch
                                                     {
-                                                        "completed" => "bg-success",
+                                                        "paid" => "bg-success",
                                                         "pending" => "bg-warning",
                                                         "failed" => "bg-danger",
                                                         "cancelled" => "bg-secondary",
@@ -142,7 +142,7 @@
                                                     };
                                                     var statusIcon = payment.STATUS?.ToLower() switch
                                                     {
-                                                        "completed" => "fa-check",
+                                                        "paid" => "fa-check",
                                                         "pending" => "fa-clock",
                                                         "failed" => "fa-times",
                                                         "cancelled" => "fa-ban",

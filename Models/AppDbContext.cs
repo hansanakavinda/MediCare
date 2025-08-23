@@ -35,6 +35,7 @@ public partial class AppDbContext : DbContext
 
     public virtual DbSet<USER> USERs { get; set; }
 
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder
@@ -210,7 +211,7 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.METHOD)
                 .HasMaxLength(20)
                 .IsUnicode(false)
-                .HasDefaultValueSql("'Online'");
+                .HasDefaultValueSql("'credit card'");
             entity.Property(e => e.PAID_AT).HasPrecision(6);
             entity.Property(e => e.STATUS)
                 .HasMaxLength(20)

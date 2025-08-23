@@ -32,7 +32,7 @@ namespace MediCare.Controllers
             var existingPayment = await _db.PAYMENTs
                 .FirstOrDefaultAsync(p => p.APPOINTMENT_ID == appointmentId);
 
-            if (existingPayment != null && existingPayment.STATUS == "Completed")
+            if (existingPayment != null && existingPayment.STATUS == "Paid")
             {
                 TempData["Info"] = "This appointment has already been paid for.";
                 return RedirectToAction("MyAppointments", "Appointments");
@@ -63,7 +63,7 @@ namespace MediCare.Controllers
             var existingPayment = await _db.PAYMENTs
                 .FirstOrDefaultAsync(p => p.APPOINTMENT_ID == appointmentId);
 
-            if (existingPayment != null && existingPayment.STATUS == "Completed")
+            if (existingPayment != null && existingPayment.STATUS == "Paid")
             {
                 TempData["Error"] = "Payment has already been processed for this appointment.";
                 return RedirectToAction("Pay", new { appointmentId = appointmentId });
@@ -80,7 +80,7 @@ namespace MediCare.Controllers
                 payment = existingPayment;
                 payment.AMOUNT = amount;
                 payment.METHOD = paymentMethod;
-                payment.STATUS = "Completed";
+                payment.STATUS = "Paid";
                 payment.PAID_AT = DateTime.Now;
                 payment.TXN_REF = transactionRef;
             }
@@ -92,7 +92,7 @@ namespace MediCare.Controllers
                     APPOINTMENT_ID = appointmentId,
                     AMOUNT = amount,
                     METHOD = paymentMethod,
-                    STATUS = "Completed",
+                    STATUS = "Paid",
                     PAID_AT = DateTime.Now,
                     TXN_REF = transactionRef
                 };
