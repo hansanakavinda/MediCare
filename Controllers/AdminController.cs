@@ -358,5 +358,59 @@ namespace MediCare.Controllers
             public decimal ScheduleId { get; set; }
             public bool HasAppointments { get; set; }
         }
+
+        // Show report options
+        public IActionResult Reports()
+        {
+            return View();
+        }
+
+        // Download Appointments Report (CSV example)
+        public async Task<IActionResult> DownloadAppointmentsReport()
+        {
+            var appointments = await _db.APPOINTMENTs
+                .Include(a => a.PATIENT).ThenInclude(p => p.USER)
+                .Include(a => a.DOCTOR).ThenInclude(d => d.USER)
+                .ToListAsync();
+
+            var csv = "AppointmentId,Patient,Doctor,Status,Date\n" +
+                string.Join("\n", appointments.Select(a =>
+                    $"{a.APPOINTMENT_ID},\"{a.PATIENT?.USER?.FULL_NAME}\",\"{a.DOCTOR?.USER?.FULL_NAME}\",{a.STATUS},{a.SCHEDULED_AT:yyyy-MM-dd HH:mm}"
+                ));
+
+            var bytes = System.Text.Encoding.UTF8.GetBytes(csv);
+            return File(bytes, "text/csv", "appointments_report.csv");
+        }
+
+        // Download Payments Report (CSV example)
+        public async Task<IActionResult> DownloadPaymentsReport()
+        {
+            var payments = await _db.PAYMENTs
+                .Include(p => p.APPOINTMENT).ThenInclude(a => a.PATIENT).ThenInclude(p => p.USER)
+                .ToListAsync();
+
+            var csv = "PaymentId,Patient,Amount,Status,Method,PaidAt\n" +
+                string.Join("\n", payments.Select(p =>
+                    $"{p.PAYMENT_ID},\"{p.APPOINTMENT?.PATIENT?.USER?.FULL_NAME}\",{p.AMOUNT},{p.STATUS},{p.METHOD},{p.PAID_AT:yyyy-MM-dd HH:mm}"
+                ));
+
+            var bytes = System.Text.Encoding.UTF8.GetBytes(csv);
+            return File(bytes, "text/csv", "payments_report.csv");
+        }
+
+        // Download Patients Report (CSV example)
+        public async Task<IActionResult> DownloadPatientsReport()
+        {
+            var patients = await _db.PATIENTs.Include(p => p.USER).ToListAsync();
+
+            var csv = "PatientId,FullName,Email,Phone,Gender,DOB\n" +
+                string.Join("\n", patients.Select(p =>
+                    $"{p.PATIENT_ID},\"{p.USER?.FULL_NAME}\",\"{p.USER?.EMAIL}\",\"{p.USER?.PHONE}\",{p.GENDER},{p.DOB:yyyy-MM-dd}"
+                ));
+
+            var bytes = System.Text.Encoding.UTF8.GetBytes(csv);
+            return File(bytes, "text/csv", "patients_report.csv");
+        }
+
     }
 }

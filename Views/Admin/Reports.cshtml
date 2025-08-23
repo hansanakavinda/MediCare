@@ -1,0 +1,17 @@
+﻿@{
+    ViewData["Title"] = "Generate Reports";
+}
+<div class="container py-4">
+    <h2 class="mb-4"><i class="fas fa-file-alt me-2"></i>Generate Reports</h2>
+    <div class="list-group">
+        <a asp-action="DownloadAppointmentsReport" class="list-group-item list-group-item-action">
+            <i class="fas fa-calendar-alt me-2"></i>Download Appointments Report (CSV)
+        </a>
+        <a asp-action="DownloadPaymentsReport" class="list-group-item list-group-item-action">
+            <i class="fas fa-credit-card me-2"></i>Download Payments Report (CSV)
+        </a>
+        <a asp-action="DownloadPatientsReport" class="list-group-item list-group-item-action">
+            <i class="fas fa-users me-2"></i>Download Patients Report (CSV)
+        </a>
+    </div>
+</div>
