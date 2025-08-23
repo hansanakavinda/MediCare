@@ -89,6 +89,8 @@ namespace MediCare.Controllers
                 .Include(a => a.DOCTOR).ThenInclude(d => d.USER)
                 .Include(a => a.DOCTOR).ThenInclude(d => d.SPECIALTY)
                 .Include(a => a.DOCTOR).ThenInclude(d => d.CLINIC)
+                .Include(a => a.PRESCRIPTIONs)
+                .Include(a => a.FEEDBACKs)
                 .Where(a => a.PATIENT_ID == patient.PATIENT_ID)
                 .OrderByDescending(a => a.SCHEDULED_AT)
                 .ToListAsync();

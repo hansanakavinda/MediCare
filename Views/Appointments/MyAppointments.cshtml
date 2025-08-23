@@ -125,6 +125,28 @@
                                             </div>
                                         }
 
+                                        @* Add this block to show prescriptions *@
+                                        @if (appointment.PRESCRIPTIONs != null && appointment.PRESCRIPTIONs.Any())
+                                        {
+                                            <div class="detail-item mb-2">
+                                                <i class="fas fa-prescription-bottle-alt text-primary me-2"></i>
+                                                <strong>Prescription:</strong>
+                                                <ul class="mb-0">
+                                                    @foreach (var prescription in appointment.PRESCRIPTIONs)
+                                                    {
+                                                        <li>
+                                                            <span class="text-success">
+                                                                @prescription.CONTENT
+                                                            </span>
+                                                            <small class="text-muted ms-2">
+                                                                (@prescription.CREATED_AT.ToString("MMM dd, yyyy"))
+                                                            </small>
+                                                        </li>
+                                                    }
+                                                </ul>
+                                            </div>
+                                        }
+
                                         <div class="detail-item">
                                             <i class="fas fa-calendar-plus text-muted me-2"></i>
                                             <small class="text-muted">Booked: @appointment.CREATED_AT.ToString("MMM dd, yyyy")</small>
@@ -149,7 +171,7 @@
                                     </div>
                                 }
                                 <!-- Feedback Option -->
-                                @if (appointment.STATUS == "Completed")
+                                @if (appointment.STATUS == "Completed" && appointment.FEEDBACKs == null)
                                 {
                                     <div class="card-footer bg-transparent border-0">
                                         <div class="d-flex justify-content-end">

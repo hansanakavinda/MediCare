@@ -60,10 +60,10 @@ namespace MediCare.Controllers
             return View();
         }
 
-        // POST: Feedback/Create
+        // POST: Feedback/SendFeedback
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(int appointmentId, int rating, string? message)
+        public async Task<IActionResult> SendFeedback(int appointmentId, string? message)
         {
             // Get current patient ID from claims
             var userId = HttpContext.Session.GetInt32("UserId");
@@ -87,10 +87,6 @@ namespace MediCare.Controllers
                 TempData["ErrorMessage"] = "Appointment not found or not eligible for feedback.";
                 return RedirectToAction("MyPayments", "Payments");
             }
-
-
-            // Create new feedback
-            int rating1 = rating;
 
             var feedback = new FEEDBACK
             {
