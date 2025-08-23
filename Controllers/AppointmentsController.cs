@@ -7,11 +7,7 @@ namespace MediCare.Controllers
     public class AppointmentsController : Controller
     {
         private readonly AppDbContext _db;
-
-        public AppointmentsController(AppDbContext db)
-        {
-            _db = db;
-        }
+        public AppointmentsController(AppDbContext db) { _db = db; }
 
         // Show booking form for a specific doctor
         public async Task<IActionResult> Book(int doctorId)
@@ -28,8 +24,7 @@ namespace MediCare.Controllers
                 .Include(d => d.SCHEDULEs)
                 .FirstOrDefaultAsync(d => d.DOCTOR_ID == doctorId);
 
-            if (doctor == null)
-                return NotFound("Doctor not found");
+            if (doctor == null) return NotFound("Doctor not found");
 
             return View(doctor);
         }
@@ -51,15 +46,15 @@ namespace MediCare.Controllers
 
             // Check if the appointment slot is already taken
             var existingAppointment = await _db.APPOINTMENTs
-                .FirstOrDefaultAsync(a =>
-                    a.DOCTOR_ID == doctorId &&
-                    a.SCHEDULED_AT == scheduledDateTime &&
-                    a.STATUS != "Cancelled");
+                .Where(a => a.DOCTOR_ID == doctorId &&
+                           a.SCHEDULED_AT == scheduledDateTime &&
+                           a.STATUS != "Cancelled")
+                .FirstOrDefaultAsync();
 
             if (existingAppointment != null)
             {
                 TempData["Error"] = "This appointment slot is already booked. Please select another time.";
-                return RedirectToAction("Book", new { doctorId });
+                return RedirectToAction("Book", new { doctorId = doctorId });
             }
 
             var appt = new APPOINTMENT
@@ -75,8 +70,8 @@ namespace MediCare.Controllers
             _db.APPOINTMENTs.Add(appt);
             await _db.SaveChangesAsync();
 
-            TempData["Success"] = "Appointment booked successfully!";
-            return RedirectToAction("MyAppointments");
+            TempData["Success"] = "Appointment booked successfully! Please proceed with payment to confirm your appointment.";
+            return RedirectToAction("Pay", "Payments", new { appointmentId = appt.APPOINTMENT_ID });
         }
 
         // Show patient's appointments
@@ -126,7 +121,6 @@ namespace MediCare.Controllers
 
             appointment.STATUS = "Cancelled";
             appointment.UPDATED_AT = DateTime.Now;
-
             await _db.SaveChangesAsync();
 
             TempData["Success"] = "Appointment cancelled successfully.";

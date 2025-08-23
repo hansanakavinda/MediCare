@@ -1,0 +1,324 @@
+﻿@model MediCare.Models.PAYMENT
+
+@{
+    ViewData["Title"] = "Payment Successful";
+}
+
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="text-center mb-4">
+                <!-- Success Animation -->
+                <div class="success-icon mb-3">
+                    <i class="fas fa-check-circle fa-5x text-success"></i>
+                </div>
+                <h1 class="text-success">Payment Successful!</h1>
+                <p class="lead text-muted">Your appointment has been confirmed and payment processed successfully.</p>
+            </div>
+
+            <!-- Payment Receipt -->
+            <div class="card shadow-lg">
+                <div class="card-header bg-success text-white text-center">
+                    <h4 class="mb-0">
+                        <i class="fas fa-receipt me-2"></i>
+                        Payment Receipt
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Transaction Details -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="receipt-item">
+                                <label class="text-muted small">Transaction ID:</label>
+                                <div class="fw-bold text-primary">@Model.TXN_REF</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            <div class="receipt-item">
+                                <label class="text-muted small">Payment Date:</label>
+                                <div class="fw-bold">@Model.PAID_AT?.ToString("dddd, MMMM dd, yyyy")</div>
+                                <small class="text-muted">@Model.PAID_AT?.ToString("hh:mm tt")</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <!-- Appointment Details -->
+                    <div class="appointment-details mb-4">
+                        <h5 class="mb-3">
+                            <i class="fas fa-calendar-check me-2 text-primary"></i>
+                            Appointment Details
+                        </h5>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="detail-group mb-3">
+                                    <label class="text-muted small">Doctor:</label>
+                                    <div class="d-flex align-items-center">
+                                        <div class="doctor-avatar bg-primary text-white rounded-circle me-2">
+                                            @(Model.APPOINTMENT?.DOCTOR?.USER?.FULL_NAME?.FirstOrDefault() ?? 'D')
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold">Dr. @(Model.APPOINTMENT?.DOCTOR?.USER?.FULL_NAME ?? "N/A")</div>
+                                            <small class="text-muted">@(Model.APPOINTMENT?.DOCTOR?.SPECIALTY?.NAME ?? "General")</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="detail-group mb-3">
+                                    <label class="text-muted small">Appointment ID:</label>
+                                    <div class="fw-bold">#@Model.APPOINTMENT_ID</div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="detail-group mb-3">
+                                    <label class="text-muted small">Date & Time:</label>
+                                    <div class="fw-bold">@Model.APPOINTMENT?.SCHEDULED_AT.ToString("dddd, MMMM dd, yyyy")</div>
+                                    <div class="text-primary">@Model.APPOINTMENT?.SCHEDULED_AT.ToString("hh:mm tt")</div>
+                                </div>
+
+                                <div class="detail-group mb-3">
+                                    <label class="text-muted small">Location:</label>
+                                    <div>
+                                        <i class="fas fa-map-marker-alt text-muted me-1"></i>
+                                        @(Model.APPOINTMENT?.DOCTOR?.CLINIC?.NAME ?? "N/A")
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <!-- Payment Summary -->
+                    <div class="payment-summary mb-4">
+                        <h5 class="mb-3">
+                            <i class="fas fa-money-bill-wave me-2 text-primary"></i>
+                            Payment Summary
+                        </h5>
+                        
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Consultation Fee:</span>
+                                    <span>LKR @Model.AMOUNT.ToString("N0")</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Processing Fee:</span>
+                                    <span>LKR 0</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Discount:</span>
+                                    <span class="text-success">- LKR 0</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="total-section bg-success bg-opacity-10 p-3 rounded">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <strong class="h5 mb-0">Total Paid:</strong>
+                                <strong class="h4 text-success mb-0">LKR @Model.AMOUNT.ToString("N0")</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Method -->
+                    <div class="payment-method mb-4">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="text-muted small">Payment Method:</label>
+                                <div class="d-flex align-items-center">
+                                    @{
+                                        var (icon, color) = Model.METHOD?.ToLower() switch
+                                        {
+                                            "credit card" => ("fa-credit-card", "text-primary"),
+                                            "debit card" => ("fa-university", "text-success"),
+                                            "digital wallet" => ("fa-mobile-alt", "text-info"),
+                                            "bank transfer" => ("fa-building-columns", "text-warning"),
+                                            _ => ("fa-credit-card", "text-secondary")
+                                        };
+                                    }
+                                    <i class="fas @icon @color me-2"></i>
+                                    <span class="fw-bold">@Model.METHOD</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="text-muted small">Status:</label>
+                                <div>
+                                    <span class="badge bg-success">
+                                        <i class="fas fa-check me-1"></i>@Model.STATUS
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Important Notes -->
+                    <div class="alert alert-info">
+                        <h6><i class="fas fa-info-circle me-2"></i>Important Notes:</h6>
+                        <ul class="mb-0">
+                            <li>Please arrive 15 minutes before your scheduled appointment time</li>
+                            <li>Bring a valid ID and any relevant medical documents</li>
+                            <li>If you need to reschedule, please contact us at least 24 hours in advance</li>
+                            <li>Keep this receipt for your records</li>
+                        </ul>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="row g-3 mt-4">
+                        <div class="col-md-4">
+                            <a href="/Appointments/MyAppointments" class="btn btn-primary btn-lg w-100">
+                                <i class="fas fa-calendar me-2"></i>
+                                View Appointments
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="/Payments/MyPayments" class="btn btn-outline-success btn-lg w-100">
+                                <i class="fas fa-receipt me-2"></i>
+                                Payment History
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <button onclick="window.print()" class="btn btn-outline-secondary btn-lg w-100">
+                                <i class="fas fa-print me-2"></i>
+                                Print Receipt
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Information -->
+            <div class="text-center mt-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h6>Need Help?</h6>
+                        <p class="text-muted mb-2">Contact our support team for any assistance</p>
+                        <div class="row justify-content-center">
+                            <div class="col-auto">
+                                <i class="fas fa-phone text-primary me-1"></i>
+                                <span>+94 11 234 5678</span>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-envelope text-primary me-1"></i>
+                                <span>support@medicare.lk</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .success-icon {
+        animation: successPulse 2s ease-in-out;
+    }
+
+    @@keyframes successPulse {
+        0% {
+            transform: scale(0);
+            opacity: 0;
+        }
+        50% {
+            transform: scale(1.1);
+            opacity: 1;
+        }
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    .doctor-avatar {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .receipt-item,
+    .detail-group {
+        margin-bottom: 1rem;
+    }
+
+    .receipt-item label,
+    .detail-group label {
+        display: block;
+        margin-bottom: 0.25rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+    }
+
+    .total-section {
+        border: 2px solid #28a745;
+    }
+
+    .card {
+        border: none;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+
+    .card-header {
+        border-bottom: none;
+    }
+
+    @@media print {
+        .btn, .card-header, .alert {
+            display: none !important;
+        }
+        
+        .card {
+            box-shadow: none !important;
+            border: 1px solid #dee2e6 !important;
+        }
+        
+        body {
+            font-size: 12px;
+        }
+        
+        .success-icon {
+            display: none;
+        }
+    }
+
+    .btn-lg {
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+    }
+
+    .alert ul {
+        padding-left: 1.25rem;
+    }
+
+    .alert li {
+        margin-bottom: 0.25rem;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add some interactive feedback
+        console.log('Payment successful page loaded');
+        
+        // Auto-scroll to top
+        window.scrollTo(0, 0);
+        
+        // Add click effect to buttons
+        const buttons = document.querySelectorAll('.btn');
+        buttons.forEach(button => {
+            button.addEventListener('click', function() {
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 150);
+            });
+        });
+    });
+</script>

@@ -1,0 +1,368 @@
+﻿@model MediCare.Models.APPOINTMENT
+
+@{
+    ViewData["Title"] = "Payment";
+}
+
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg">
+                <div class="card-header bg-success text-white text-center">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-credit-card me-2"></i>
+                        Complete Your Payment
+                    </h3>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Appointment Summary -->
+                    <div class="appointment-summary bg-light p-4 rounded mb-4">
+                        <h5 class="mb-3">
+                            <i class="fas fa-receipt me-2 text-primary"></i>
+                            Appointment Summary
+                        </h5>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="summary-item mb-3">
+                                    <label class="text-muted small">Doctor:</label>
+                                    <div class="fw-bold">Dr. @(Model.DOCTOR?.USER?.FULL_NAME ?? "N/A")</div>
+                                </div>
+                                
+                                <div class="summary-item mb-3">
+                                    <label class="text-muted small">Specialty:</label>
+                                    <div>
+                                        <span class="badge bg-info">@(Model.DOCTOR?.SPECIALTY?.NAME ?? "General")</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="summary-item mb-3">
+                                    <label class="text-muted small">Date & Time:</label>
+                                    <div class="fw-bold">
+                                        @Model.SCHEDULED_AT.ToString("dddd, MMMM dd, yyyy")
+                                        <br>
+                                        <small class="text-primary">@Model.SCHEDULED_AT.ToString("hh:mm tt")</small>
+                                    </div>
+                                </div>
+                                
+                                <div class="summary-item mb-3">
+                                    <label class="text-muted small">Location:</label>
+                                    <div>
+                                        <i class="fas fa-map-marker-alt text-muted me-1"></i>
+                                        @(Model.DOCTOR?.CLINIC?.NAME ?? "N/A")
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row border-top pt-3">
+                            <div class="col-md-6">
+                                <div class="summary-item">
+                                    <label class="text-muted small">Appointment ID:</label>
+                                    <div class="fw-bold">#@Model.APPOINTMENT_ID</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 text-end">
+                                <div class="summary-item">
+                                    <label class="text-muted small">Consultation Fee:</label>
+                                    <div class="h4 text-success mb-0">
+                                        LKR @(Model.DOCTOR?.FEE?.ToString("N0") ?? "0")
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Form -->
+                    <form asp-action="ProcessPayment" method="post" id="paymentForm">
+                        <input type="hidden" name="appointmentId" value="@Model.APPOINTMENT_ID" />
+                        <input type="hidden" name="amount" value="@(Model.DOCTOR?.FEE ?? 0)" />
+                        
+                        <h5 class="mb-3">
+                            <i class="fas fa-payment me-2 text-primary"></i>
+                            Payment Method
+                        </h5>
+                        
+                        <div class="payment-methods mb-4">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="payment-option">
+                                        <input type="radio" name="paymentMethod" value="Card" id="creditCard" class="payment-radio" required>
+                                        <label for="creditCard" class="payment-label">
+                                            <div class="payment-card h-100 d-flex align-items-center p-3 border rounded">
+                                                <i class="fas fa-credit-card fa-2x text-primary me-3"></i>
+                                                <div>
+                                                    <strong>Credit Card</strong>
+                                                    <small class="d-block text-muted">Visa, MasterCard, Amex</small>
+                                                </div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="payment-option">
+                                        <input type="radio" name="paymentMethod" value="Card" id="debitCard" class="payment-radio">
+                                        <label for="debitCard" class="payment-label">
+                                            <div class="payment-card h-100 d-flex align-items-center p-3 border rounded">
+                                                <i class="fas fa-university fa-2x text-success me-3"></i>
+                                                <div>
+                                                    <strong>Debit Card</strong>
+                                                    <small class="d-block text-muted">Direct bank payment</small>
+                                                </div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="payment-option">
+                                        <input type="radio" name="paymentMethod" value="Online" id="digitalWallet" class="payment-radio">
+                                        <label for="digitalWallet" class="payment-label">
+                                            <div class="payment-card h-100 d-flex align-items-center p-3 border rounded">
+                                                <i class="fas fa-mobile-alt fa-2x text-info me-3"></i>
+                                                <div>
+                                                    <strong>Digital Wallet</strong>
+                                                    <small class="d-block text-muted">PayPal, eZ Cash, etc.</small>
+                                                </div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="payment-option">
+                                        <input type="radio" name="paymentMethod" value="Cash" id="bankTransfer" class="payment-radio">
+                                        <label for="bankTransfer" class="payment-label">
+                                            <div class="payment-card h-100 d-flex align-items-center p-3 border rounded">
+                                                <i class="fas fa-building-columns fa-2x text-warning me-3"></i>
+                                                <div>
+                                                    <strong>Bank Transfer</strong>
+                                                    <small class="d-block text-muted">Online banking</small>
+                                                </div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Payment Details (Mock) -->
+                        <div id="paymentDetails" class="payment-details" style="display: none;">
+                            <h5 class="mb-3">
+                                <i class="fas fa-lock me-2 text-primary"></i>
+                                Payment Information
+                            </h5>
+                            
+                            <div class="row g-3">
+                                <div class="col-md-8">
+                                    <label class="form-label">Card Number / Account Number</label>
+                                    <input type="text" class="form-control" placeholder="1234 5678 9012 3456" maxlength="19">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">CVV</label>
+                                    <input type="text" class="form-control" placeholder="123" maxlength="3">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Cardholder Name</label>
+                                    <input type="text" class="form-control" placeholder="John Doe">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Expiry Date</label>
+                                    <input type="text" class="form-control" placeholder="MM/YY" maxlength="5">
+                                </div>
+                            </div>
+                            
+                            <div class="alert alert-info mt-3">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>Note:</strong> This is a demo payment form. No actual payment will be processed.
+                            </div>
+                        </div>
+                        
+                        <!-- Total Amount -->
+                        <div class="payment-total bg-success bg-opacity-10 p-3 rounded mb-4">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <span class="text-muted">Total Amount to Pay:</span>
+                                </div>
+                                <div class="col-auto">
+                                    <span class="h3 text-success mb-0">
+                                        LKR @(Model.DOCTOR?.FEE?.ToString("N0") ?? "0")
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="d-flex justify-content-between">
+                            <a href="/Appointments/MyAppointments" class="btn btn-outline-secondary btn-lg">
+                                <i class="fas fa-arrow-left me-2"></i>
+                                Back to Appointments
+                            </a>
+                            <button type="submit" class="btn btn-success btn-lg px-5" id="payButton" disabled>
+                                <i class="fas fa-lock me-2"></i>
+                                Pay Now
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Security Notice -->
+            <div class="text-center mt-3">
+                <small class="text-muted">
+                    <i class="fas fa-shield-alt me-1"></i>
+                    Your payment information is secure and encrypted
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Display Messages -->
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show position-fixed" style="top: 20px; right: 20px; z-index: 1050;">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["Info"] != null)
+{
+    <div class="alert alert-info alert-dismissible fade show position-fixed" style="top: 20px; right: 20px; z-index: 1050;">
+        <i class="fas fa-info-circle me-2"></i>
+        @TempData["Info"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<style>
+    .payment-radio {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .payment-label {
+        cursor: pointer;
+        width: 100%;
+    }
+
+    .payment-card {
+        transition: all 0.3s ease;
+        background: #fff;
+    }
+
+    .payment-card:hover {
+        border-color: #007bff !important;
+        background-color: #f8f9fa;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .payment-radio:checked + .payment-label .payment-card {
+        border-color: #28a745 !important;
+        background-color: #d4edda;
+        box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.25);
+    }
+
+    .appointment-summary {
+        border-left: 4px solid #28a745;
+    }
+
+    .summary-item label {
+        margin-bottom: 0.25rem;
+        font-size: 0.875rem;
+    }
+
+    .card {
+        border: none;
+    }
+
+    .card-header {
+        border-bottom: none;
+    }
+
+    .payment-total {
+        border: 2px solid #28a745;
+    }
+
+    .btn-success {
+        background: linear-gradient(45deg, #28a745, #20c997);
+        border: none;
+    }
+
+    .btn-success:hover {
+        background: linear-gradient(45deg, #218838, #1ea085);
+        transform: translateY(-1px);
+    }
+
+    .btn-success:disabled {
+        background: #6c757d;
+        opacity: 0.6;
+    }
+
+    .payment-details {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const paymentRadios = document.querySelectorAll('.payment-radio');
+        const paymentDetails = document.getElementById('paymentDetails');
+        const payButton = document.getElementById('payButton');
+
+        // Enable pay button when payment method is selected
+        paymentRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                if (this.checked) {
+                    payButton.disabled = false;
+                    paymentDetails.style.display = 'block';
+                    
+                    // Smooth scroll to payment details
+                    setTimeout(() => {
+                        paymentDetails.scrollIntoView({ 
+                            behavior: 'smooth', 
+                            block: 'center' 
+                        });
+                    }, 100);
+                }
+            });
+        });
+
+        // Format card number input
+        const cardNumberInput = document.querySelector('input[placeholder="1234 5678 9012 3456"]');
+        if (cardNumberInput) {
+            cardNumberInput.addEventListener('input', function() {
+                let value = this.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+                let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
+                this.value = formattedValue;
+            });
+        }
+
+        // Format expiry date input
+        const expiryInput = document.querySelector('input[placeholder="MM/YY"]');
+        if (expiryInput) {
+            expiryInput.addEventListener('input', function() {
+                let value = this.value.replace(/\D/g, '');
+                if (value.length >= 2) {
+                    value = value.substring(0, 2) + '/' + value.substring(2, 4);
+                }
+                this.value = value;
+            });
+        }
+
+        // Auto-hide alerts after 5 seconds
+        setTimeout(function() {
+            $('.alert').fadeOut('slow');
+        }, 5000);
+    });
+</script>
